@@ -27,7 +27,9 @@ export const routes: Routes = [
       ...PRODUCT_NAVIGATION.map((item) => ({
         path: item.path,
         loadComponent: () =>
-          import('./features/workspace/workspace-page').then((m) => m.WorkspacePage),
+          item.key === 'equipment'
+            ? import('./features/equipment/equipment-page').then((m) => m.EquipmentPage)
+            : import('./features/workspace/workspace-page').then((m) => m.WorkspacePage),
         data: { view: 'domain', section: item.key },
       })),
       {

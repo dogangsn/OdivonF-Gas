@@ -28,26 +28,26 @@ import { PRODUCT } from '../../domain/product-manifest';
         <div class="relative max-w-2xl">
           <span
             class="mb-5 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold"
-            >Uyumluluk operasyon merkezi</span
+            >F-Gas uyum ve saha operasyon platformu</span
           >
           <h1 class="m-0 text-5xl font-black leading-tight">
-            Karmaşık mevzuatı<br />net aksiyonlara dönüştürün.
+            Ekipmanınızın gaz yükünü,<br />kontrol tarihini ve denetim izini yönetin.
           </h1>
           <p class="mt-6 max-w-xl text-base leading-7 text-indigo-100">
             {{ product.promiseKey | t }}
           </p>
           <div class="mt-10 grid grid-cols-3 gap-3">
             <div class="rounded-2xl bg-white/10 p-4">
-              <strong class="block text-2xl">8</strong
-              ><span class="text-xs text-indigo-200">Dil desteği</span>
+              <strong class="block text-2xl">100%</strong
+              ><span class="text-xs text-indigo-200">Denetim izi</span>
             </div>
             <div class="rounded-2xl bg-white/10 p-4">
-              <strong class="block text-2xl">24/7</strong
-              ><span class="text-xs text-indigo-200">Canlı izleme</span>
+              <strong class="block text-2xl">Tek panel</strong
+              ><span class="text-xs text-indigo-200">Ekipman ve gaz hareketi</span>
             </div>
             <div class="rounded-2xl bg-white/10 p-4">
-              <strong class="block text-2xl">%100</strong
-              ><span class="text-xs text-indigo-200">İzlenebilirlik</span>
+              <strong class="block text-2xl">Hazır</strong
+              ><span class="text-xs text-indigo-200">Denetim paketi</span>
             </div>
           </div>
         </div>
