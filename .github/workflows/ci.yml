@@ -13,9 +13,10 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
       - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm run typecheck
       - run: npm test -- --watch=false
       - run: npm run contract
       - run: npm run build
       - name: Reject committed secrets
-        run: "! git grep -nE '(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|serviceAccountKey|FIREBASE_PRIVATE_KEY)' -- ':!package-lock.json' ':!.github/workflows/ci.yml'"
+        run: "! git grep -nE '(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|serviceAccountKey|FIREBASE_PRIVATE_KEY|IYZICO_SECRET_KEY|sk_live_[A-Za-z0-9]+|AKIA[0-9A-Z]{16})' -- ':!package-lock.json' ':!.github/workflows/ci.yml'"

@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { apiErrorDetails } from '../../core/api/api-error';
 
 export type EquipmentType =
   | 'stationary-refrigeration'
@@ -71,6 +72,10 @@ export interface FgasDashboard {
   readonly overdueLeakChecks: number;
   readonly refrigerantChargeKg: number;
   readonly co2EquivalentTonnes: number;
+  readonly leakChecks: number;
+  readonly pendingActions: number;
+  readonly certifiedTechnicians: number;
+  readonly gasRecoveredKg: number;
 }
 
 export interface AuditEntry {
@@ -189,13 +194,8 @@ export class FgasEquipmentApi {
       return envelope.data;
     } catch (error) {
       if (error instanceof HttpErrorResponse) {
-        const body = error.error as { code?: string; message?: string; requestId?: string } | null;
-        throw new FgasApiError(
-          error.status,
-          body?.code ?? 'REQUEST_FAILED',
-          body?.message ?? 'İşlem tamamlanamadı.',
-          body?.requestId ?? error.headers.get('x-request-id'),
-        );
+        const details = apiErrorDetails(error, 'İşlem tamamlanamadı.');
+        throw new FgasApiError(error.status, details.code, details.message, details.requestId);
       }
       throw error;
     }

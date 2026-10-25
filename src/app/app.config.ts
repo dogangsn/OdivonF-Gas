@@ -4,9 +4,5 @@ import { routes } from './app.routes';
 import { provideOdivonApi } from './core/api/api';
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
-    provideOdivonApi()
-  ]
+  providers: [provideBrowserGlobalErrorListeners(), provideRouter(routes), provideOdivonApi()],
 };

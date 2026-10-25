@@ -10,13 +10,13 @@ import {
   Auth,
   User,
   browserLocalPersistence,
-  createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
+  reload,
+  sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
   signOut,
-  updateProfile,
 } from 'firebase/auth';
 import { environment } from '../../../environments/environment';
 
@@ -26,15 +26,29 @@ export class FirebaseIdentity {
   private app?: FirebaseApp;
   private auth?: Auth;
   private appCheck?: AppCheck;
+  private initialization?: Promise<void>;
 
   readonly configured = Boolean(environment.firebase.apiKey);
 
   async initialize(): Promise<void> {
+    if (this.initialization) return this.initialization;
+    this.initialization = this.initializeInternal();
+    return this.initialization;
+  }
+
+  private async initializeInternal(): Promise<void> {
     if (this.app || !environment.firebase.apiKey) return;
     this.app = initializeApp(environment.firebase);
     this.auth = getAuth(this.app);
     await setPersistence(this.auth, browserLocalPersistence);
-    onAuthStateChanged(this.auth, (user) => this.user.set(user));
+    await new Promise<void>((resolve) => {
+      const unsubscribe = onAuthStateChanged(this.auth!, (user) => {
+        this.user.set(user);
+        unsubscribe();
+        onAuthStateChanged(this.auth!, (nextUser) => this.user.set(nextUser));
+        resolve();
+      });
+    });
     if (environment.appCheckSiteKey) {
       this.appCheck = initializeAppCheck(this.app, {
         provider: new ReCaptchaEnterpriseProvider(environment.appCheckSiteKey),
@@ -65,16 +79,23 @@ export class FirebaseIdentity {
     return (await signInWithEmailAndPassword(this.auth, email, password)).user;
   }
 
-  async register(name: string, email: string, password: string): Promise<User> {
-    await this.initialize();
-    if (!this.auth) throw new Error('Firebase Auth is not configured.');
-    const user = (await createUserWithEmailAndPassword(this.auth, email, password)).user;
-    await updateProfile(user, { displayName: name });
-    return user;
-  }
-
   async logout(): Promise<void> {
     await this.initialize();
     if (this.auth) await signOut(this.auth);
+  }
+
+  async resetPassword(email: string): Promise<void> {
+    await this.initialize();
+    if (!this.auth) throw new Error('Firebase Auth is not configured.');
+    await sendPasswordResetEmail(this.auth, email.trim().toLowerCase());
+  }
+
+  async refreshUser(): Promise<User | null> {
+    await this.initialize();
+    if (!this.auth?.currentUser) return null;
+    await reload(this.auth.currentUser);
+    await this.auth.currentUser.getIdToken(true);
+    this.user.set(this.auth.currentUser);
+    return this.auth.currentUser;
   }
 }
