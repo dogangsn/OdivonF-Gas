@@ -49,6 +49,7 @@ const EMPTY_DRAFT: EquipmentDraft = {
   template: `
     <div class="space-y-6">
       <app-page-header
+        icon="precision_manufacturing"
         eyebrow="F-GAS UYUM MERKEZİ"
         title="Ekipman Envanteri"
         description="Florlu sera gazı içeren ekipmanların teknik kimliğini, gaz yükünü ve yasal kontrol takvimini yönetin."
@@ -59,39 +60,64 @@ const EMPTY_DRAFT: EquipmentDraft = {
       </app-page-header>
 
       @if (dashboard(); as stats) {
-        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="F-Gas göstergeleri">
-          <article class="odv-card bg-gradient-to-br from-violet-600 to-indigo-700 p-5 text-white">
-            <span class="text-xs font-extrabold uppercase tracking-wider text-white/75"
-              >Toplam ekipman</span
-            >
-            <strong class="mt-3 block text-4xl font-black">{{ stats.totalEquipment }}</strong>
-            <span class="mt-2 block text-xs text-white/75"
+        <section
+          class="mb-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
+          aria-label="F-Gas göstergeleri"
+        >
+          <article class="odv-kpi">
+            <div class="flex items-center justify-between">
+              <span class="odv-kpi-label">Toplam ekipman</span>
+              <span
+                class="odv-kpi-icon bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
+                ><span class="material-symbols-rounded" aria-hidden="true"
+                  >precision_manufacturing</span
+                ></span
+              >
+            </div>
+            <strong class="odv-kpi-value">{{ stats.totalEquipment }}</strong>
+            <span class="mt-1.5 block text-xs font-semibold text-slate-500 dark:text-slate-400"
               >{{ stats.activeEquipment }} aktif varlık</span
             >
           </article>
-          <article class="odv-card p-5">
-            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"
-              >Aksiyon gerekli</span
-            ><strong class="mt-3 block text-4xl font-black text-amber-600">{{
+          <article class="odv-kpi">
+            <div class="flex items-center justify-between">
+              <span class="odv-kpi-label">Aksiyon gerekli</span>
+              <span
+                class="odv-kpi-icon bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300"
+                ><span class="material-symbols-rounded" aria-hidden="true">build</span></span
+              >
+            </div>
+            <strong class="odv-kpi-value" [class.!text-amber-600]="stats.actionRequired">{{
               stats.actionRequired
-            }}</strong
-            ><span class="mt-2 block text-xs text-slate-500">Teknik inceleme bekleyen</span>
+            }}</strong>
+            <span class="mt-1.5 block text-xs font-semibold text-slate-500 dark:text-slate-400"
+              >Teknik inceleme bekleyen</span
+            >
           </article>
-          <article class="odv-card p-5">
-            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"
-              >Geciken kontrol</span
-            ><strong class="mt-3 block text-4xl font-black text-rose-600">{{
+          <article class="odv-kpi">
+            <div class="flex items-center justify-between">
+              <span class="odv-kpi-label">Geciken kontrol</span>
+              <span
+                class="odv-kpi-icon bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300"
+                ><span class="material-symbols-rounded" aria-hidden="true">event_busy</span></span
+              >
+            </div>
+            <strong class="odv-kpi-value" [class.!text-rose-600]="stats.overdueLeakChecks">{{
               stats.overdueLeakChecks
-            }}</strong
-            ><span class="mt-2 block text-xs text-slate-500">Yasal tarihi aşan kayıt</span>
+            }}</strong>
+            <span class="mt-1.5 block text-xs font-semibold text-slate-500 dark:text-slate-400"
+              >Yasal tarihi aşan kayıt</span
+            >
           </article>
-          <article class="odv-card p-5">
-            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"
-              >Toplam CO₂ eşdeğeri</span
-            ><strong class="mt-3 block text-4xl font-black text-sky-600">{{
-              stats.co2EquivalentTonnes | number: '1.0-2'
-            }}</strong
-            ><span class="mt-2 block text-xs text-slate-500"
+          <article class="odv-kpi">
+            <div class="flex items-center justify-between">
+              <span class="odv-kpi-label">CO₂ eşdeğeri</span>
+              <span class="odv-kpi-icon bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-300"
+                ><span class="material-symbols-rounded" aria-hidden="true">eco</span></span
+              >
+            </div>
+            <strong class="odv-kpi-value">{{ stats.co2EquivalentTonnes | number: '1.0-2' }}</strong>
+            <span class="mt-1.5 block text-xs font-semibold text-slate-500 dark:text-slate-400"
               >ton CO₂e · {{ stats.refrigerantChargeKg | number: '1.0-2' }} kg gaz</span
             >
           </article>
@@ -99,24 +125,20 @@ const EMPTY_DRAFT: EquipmentDraft = {
       }
 
       <section class="odv-card overflow-hidden">
-        <div
-          class="flex flex-col gap-4 border-b border-slate-200 p-5 dark:border-slate-800 lg:flex-row lg:items-center lg:justify-between"
-        >
-          <div class="inline-flex rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+        <div class="flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+          <div class="odv-segment" role="group" aria-label="Kayıt görünümü">
             <button
               type="button"
-              class="rounded-lg px-4 py-2 text-xs font-bold"
-              [class.bg-white]="!archived()"
-              [class.shadow-sm]="!archived()"
+              class="odv-segment-item"
+              [attr.aria-pressed]="!archived()"
               (click)="setArchive(false)"
             >
               Aktif kayıtlar
             </button>
             <button
               type="button"
-              class="rounded-lg px-4 py-2 text-xs font-bold"
-              [class.bg-white]="archived()"
-              [class.shadow-sm]="archived()"
+              class="odv-segment-item"
+              [attr.aria-pressed]="archived()"
               (click)="setArchive(true)"
             >
               Arşiv
@@ -130,9 +152,9 @@ const EMPTY_DRAFT: EquipmentDraft = {
             ><input
               class="odv-input ps-10"
               type="search"
-              placeholder="Ad, ekipman kodu, seri no veya lokasyon…"
+              placeholder="Ad, ekipman kodu veya lokasyon ara…"
               [value]="search()"
-              (input)="search.set($any($event.target).value)"
+              (input)="onSearch($any($event.target).value)"
               (keyup.enter)="reload()"
           /></label>
         </div>
@@ -140,7 +162,7 @@ const EMPTY_DRAFT: EquipmentDraft = {
         @if (loading()) {
           <div class="grid min-h-64 place-items-center" role="status">
             <div class="text-center">
-              <span class="material-symbols-rounded animate-spin text-4xl text-violet-600"
+              <span class="material-symbols-rounded animate-spin text-4xl text-indigo-600"
                 >progress_activity</span
               >
               <p class="text-sm font-semibold text-slate-500">Ekipmanlar MainAPI’den yükleniyor…</p>
@@ -171,7 +193,7 @@ const EMPTY_DRAFT: EquipmentDraft = {
               </thead>
               <tbody>
                 @for (row of equipment(); track row.id) {
-                  <tr class="hover:bg-violet-50/40 dark:hover:bg-slate-800/60">
+                  <tr class="odv-row">
                     <td class="odv-td">
                       <button type="button" class="text-start" (click)="openEdit(row)">
                         <strong class="block text-slate-950 dark:text-white">{{ row.name }}</strong
@@ -228,13 +250,34 @@ const EMPTY_DRAFT: EquipmentDraft = {
                 } @empty {
                   <tr>
                     <td colspan="7" class="p-14 text-center">
-                      <span class="material-symbols-rounded text-5xl text-slate-300"
-                        >inventory_2</span
+                      <span
+                        class="mx-auto grid size-14 place-items-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-300"
+                        ><span class="material-symbols-rounded !text-3xl" aria-hidden="true"
+                          >inventory_2</span
+                        ></span
                       >
-                      <h3 class="mb-1 mt-3 text-lg font-black">Kayıt bulunamadı</h3>
-                      <p class="m-0 text-sm text-slate-500">
-                        Filtreyi değiştirin veya ilk ekipmanı ekleyin.
+                      <h3 class="mb-1 mt-4 text-base font-black">
+                        {{
+                          search()
+                            ? 'Eşleşen ekipman bulunamadı'
+                            : archived()
+                              ? 'Arşiv boş'
+                              : 'Envanter henüz boş'
+                        }}
+                      </h3>
+                      <p class="m-0 text-sm text-slate-500 dark:text-slate-400">
+                        {{
+                          search()
+                            ? 'Arama ifadesini değiştirin.'
+                            : 'Kontrol takvimini başlatmak için ilk ekipmanı ekleyin.'
+                        }}
                       </p>
+                      @if (!search() && !archived()) {
+                        <button type="button" class="odv-btn-primary mt-5" (click)="openCreate()">
+                          <span class="material-symbols-rounded" aria-hidden="true">add</span
+                          >Ekipman ekle
+                        </button>
+                      }
                     </td>
                   </tr>
                 }
@@ -398,7 +441,7 @@ const EMPTY_DRAFT: EquipmentDraft = {
           <h3 class="m-0 text-base font-black">Değişmez denetim izi</h3>
           <ol class="mt-4 space-y-3">
             @for (entry of audit(); track entry.id) {
-              <li class="flex items-start justify-between gap-4 border-s border-violet-300 ps-4">
+              <li class="flex items-start justify-between gap-4 border-s border-indigo-300 ps-4">
                 <div>
                   <strong class="block text-sm">{{ auditLabel(entry) }}</strong
                   ><span class="text-xs text-slate-500"
@@ -425,6 +468,12 @@ export class EquipmentPage {
   readonly saveError = signal('');
   readonly archived = signal(false);
   readonly search = signal('');
+  private searchTimer?: ReturnType<typeof setTimeout>;
+  onSearch(value: string): void {
+    this.search.set(value);
+    clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => void this.reload(), 350);
+  }
   readonly drawerOpen = signal(false);
   readonly selected = signal<FgasEquipment | null>(null);
   readonly draft = signal<EquipmentDraft>({ ...EMPTY_DRAFT });
@@ -575,7 +624,7 @@ export class EquipmentPage {
       ? 'odv-badge-success'
       : status === 'action-required'
         ? 'odv-badge-warning'
-        : 'rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600';
+        : 'odv-badge-neutral';
   }
   formatDate(value: string): string {
     return new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' }).format(new Date(value));

@@ -78,6 +78,7 @@ const CONFIG: Record<
   template: `
     <div class="space-y-6">
       <app-page-header
+        [icon]="config.icon"
         [eyebrow]="config.eyebrow"
         [title]="config.title"
         [description]="config.description"
@@ -85,55 +86,47 @@ const CONFIG: Record<
           <span class="material-symbols-rounded">add</span>{{ config.create }}
         </button>
         @if (kind === 'inspection') {
-          <button actions type="button" class="odv-btn-soft" (click)="exportReport()">
+          <button actions type="button" class="odv-btn-secondary" (click)="exportReport()">
             <span class="material-symbols-rounded">download</span>Denetim paketini indir
           </button>
         }
       </app-page-header>
-      <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Operasyon göstergeleri">
-        <article class="odv-card bg-gradient-to-br from-violet-600 to-indigo-700 p-5 text-white">
-          <span class="text-xs font-extrabold uppercase tracking-wider text-white/75"
-            >Toplam aktif kayıt</span
-          ><strong class="mt-3 block text-4xl font-black">{{ rows().length }}</strong
-          ><span class="mt-2 block text-xs text-white/75">MainAPI ile senkronize</span>
-        </article>
-        <article class="odv-card p-5">
-          <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"
-            >Tamamlanan</span
-          ><strong class="mt-3 block text-4xl font-black text-emerald-600">{{ completed() }}</strong
-          ><span class="mt-2 block text-xs text-slate-500">Kanıtı kapanmış kayıt</span>
-        </article>
-        <article class="odv-card p-5">
-          <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"
-            >Aksiyon gerekli</span
-          ><strong class="mt-3 block text-4xl font-black text-amber-600">{{
-            actionRequired()
-          }}</strong
-          ><span class="mt-2 block text-xs text-slate-500">Takip bekleyen bulgu</span>
-        </article>
-        <article class="odv-card p-5">
-          <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"
-            >Vadesi geçen</span
-          ><strong class="mt-3 block text-4xl font-black text-rose-600">{{ overdue() }}</strong
-          ><span class="mt-2 block text-xs text-slate-500">Bugünden önce kalan</span>
-        </article>
+      <section
+        class="mb-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
+        aria-label="Operasyon göstergeleri"
+      >
+        @for (kpi of kpis(); track kpi.label) {
+          <article class="odv-kpi">
+            <div class="flex items-center justify-between">
+              <span class="odv-kpi-label">{{ kpi.label }}</span>
+              <span class="odv-kpi-icon" [class]="kpi.iconClass"
+                ><span class="material-symbols-rounded" aria-hidden="true">{{
+                  kpi.icon
+                }}</span></span
+              >
+            </div>
+            <strong class="odv-kpi-value" [class]="kpi.valueClass">{{ kpi.value }}</strong>
+            <span class="mt-1.5 block text-xs font-semibold text-slate-500 dark:text-slate-400">{{
+              kpi.note
+            }}</span>
+          </article>
+        }
       </section>
       <section class="odv-card overflow-hidden">
-        <div
-          class="flex flex-col gap-3 border-b border-slate-200 p-5 dark:border-slate-800 lg:flex-row lg:items-center"
-        >
-          <div class="inline-flex rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+        <div class="flex flex-col gap-3 p-4 sm:p-5 lg:flex-row lg:items-center">
+          <div class="odv-segment" role="group" aria-label="Kayıt görünümü">
             <button
               type="button"
-              class="rounded-lg px-4 py-2 text-xs font-bold"
-              [class.bg-white]="!archived()"
+              class="odv-segment-item"
+              [attr.aria-pressed]="!archived()"
               (click)="setArchived(false)"
             >
-              Aktif</button
-            ><button
+              Aktif
+            </button>
+            <button
               type="button"
-              class="rounded-lg px-4 py-2 text-xs font-bold"
-              [class.bg-white]="archived()"
+              class="odv-segment-item"
+              [attr.aria-pressed]="archived()"
               (click)="setArchived(true)"
             >
               Arşiv
@@ -149,7 +142,7 @@ const CONFIG: Record<
               type="search"
               placeholder="Başlık, referans, lokasyon veya teknisyen ara…"
               [value]="search()"
-              (input)="search.set($any($event.target).value)"
+              (input)="onSearch($any($event.target).value)"
               (keyup.enter)="load()"
           /></label>
           <select
@@ -168,7 +161,7 @@ const CONFIG: Record<
         </div>
         @if (loading()) {
           <div class="grid min-h-64 place-items-center" role="status">
-            <span class="material-symbols-rounded animate-spin text-4xl text-violet-600"
+            <span class="material-symbols-rounded animate-spin text-4xl text-indigo-600"
               >progress_activity</span
             >
           </div>
@@ -194,7 +187,7 @@ const CONFIG: Record<
               </thead>
               <tbody>
                 @for (row of rows(); track row.id) {
-                  <tr class="hover:bg-violet-50/40 dark:hover:bg-slate-800/60">
+                  <tr class="odv-row">
                     <td class="odv-td">
                       <button class="text-start" type="button" (click)="openEdit(row)">
                         <strong class="block">{{ row.title }}</strong
@@ -252,13 +245,34 @@ const CONFIG: Record<
                 } @empty {
                   <tr>
                     <td colspan="6" class="p-14 text-center">
-                      <span class="material-symbols-rounded text-5xl text-slate-300">{{
-                        config.icon
-                      }}</span>
-                      <h3 class="mb-1 mt-3 text-lg font-black">Henüz kayıt yok</h3>
-                      <p class="m-0 text-sm text-slate-500">
-                        İlk doğrulanabilir operasyon kaydını oluşturun.
+                      <span
+                        class="mx-auto grid size-14 place-items-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-300"
+                        ><span class="material-symbols-rounded !text-3xl" aria-hidden="true">{{
+                          config.icon
+                        }}</span></span
+                      >
+                      <h3 class="mb-1 mt-4 text-base font-black">
+                        {{
+                          search() || status()
+                            ? 'Eşleşen kayıt bulunamadı'
+                            : archived()
+                              ? 'Arşiv boş'
+                              : 'Henüz kayıt yok'
+                        }}
+                      </h3>
+                      <p class="m-0 text-sm text-slate-500 dark:text-slate-400">
+                        {{
+                          search() || status()
+                            ? 'Aramayı veya durum filtresini değiştirin.'
+                            : 'İlk doğrulanabilir operasyon kaydını oluşturun.'
+                        }}
                       </p>
+                      @if (!search() && !status() && !archived()) {
+                        <button type="button" class="odv-btn-primary mt-5" (click)="openCreate()">
+                          <span class="material-symbols-rounded" aria-hidden="true">add</span
+                          >{{ config.create }}
+                        </button>
+                      }
                     </td>
                   </tr>
                 }
@@ -428,6 +442,46 @@ export class OperationPage {
     () => this.rows().filter((x) => x.status === 'action-required').length,
   );
   readonly overdue = computed(() => this.rows().filter((x) => this.isOverdue(x)).length);
+  readonly kpis = computed(() => [
+    {
+      label: this.archived() ? 'Arşivdeki kayıt' : 'Aktif kayıt',
+      value: this.rows().length,
+      note: 'MainAPI ile senkronize',
+      icon: this.config.icon,
+      iconClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300',
+      valueClass: '',
+    },
+    {
+      label: 'Tamamlanan',
+      value: this.completed(),
+      note: 'Kanıtı kapanmış kayıt',
+      icon: 'task_alt',
+      iconClass: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300',
+      valueClass: '',
+    },
+    {
+      label: 'Aksiyon gerekli',
+      value: this.actionRequired(),
+      note: 'Takip bekleyen bulgu',
+      icon: 'pending_actions',
+      iconClass: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300',
+      valueClass: this.actionRequired() ? '!text-amber-600 dark:!text-amber-400' : '',
+    },
+    {
+      label: 'Vadesi geçen',
+      value: this.overdue(),
+      note: 'Bugünden önce kalan',
+      icon: 'event_busy',
+      iconClass: 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300',
+      valueClass: this.overdue() ? '!text-rose-600 dark:!text-rose-400' : '',
+    },
+  ]);
+  private searchTimer?: ReturnType<typeof setTimeout>;
+  onSearch(value: string) {
+    this.search.set(value);
+    clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => void this.load(), 350);
+  }
   readonly model = signal<OperationDraft>({ ...EMPTY });
   readonly operationForm = form(this.model, (p) => {
     required(p.title);

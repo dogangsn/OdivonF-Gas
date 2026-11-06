@@ -10,6 +10,7 @@ import { RoleOption, SettingsApi, TenantUser } from './settings.api';
   imports: [PageHeader, SlideOver, FormField],
   template: `<div class="space-y-6">
       <app-page-header
+        icon="settings"
         eyebrow="TENANT YÖNETİMİ"
         title="Ekip ve Ayarlar"
         description="Hesap profilini, ekip erişimini ve rol atamalarını tenant sınırları içinde yönetin."
@@ -72,7 +73,7 @@ import { RoleOption, SettingsApi, TenantUser } from './settings.api';
         </div>
         @if (loading()) {
           <div class="grid min-h-52 place-items-center">
-            <span class="material-symbols-rounded animate-spin text-4xl text-violet-600"
+            <span class="material-symbols-rounded animate-spin text-4xl text-indigo-600"
               >progress_activity</span
             >
           </div>

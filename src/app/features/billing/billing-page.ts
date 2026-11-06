@@ -18,13 +18,14 @@ import {
   template: `
     <div class="space-y-6">
       <app-page-header
+        icon="credit_card"
         eyebrow="HESAP VE FATURALAMA"
         title="Abonelik Yönetimi"
         description="Planınızı, deneme sürenizi, güvenli ödeme akışını ve makbuz geçmişini yönetin."
       />
       @if (loading()) {
         <div class="odv-card grid min-h-72 place-items-center">
-          <span class="material-symbols-rounded animate-spin text-5xl text-violet-600"
+          <span class="material-symbols-rounded animate-spin text-5xl text-indigo-600"
             >progress_activity</span
           >
         </div>
@@ -37,7 +38,7 @@ import {
       } @else {
         @if (status(); as state) {
           <section
-            class="odv-card overflow-hidden bg-gradient-to-br from-slate-950 via-violet-950 to-indigo-950 p-6 text-white lg:p-8"
+            class="odv-card overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 p-6 text-white lg:p-8"
           >
             <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
@@ -69,7 +70,7 @@ import {
                 </p>
               </div>
               <div class="rounded-2xl bg-white/10 p-5 text-center">
-                <span class="material-symbols-rounded text-4xl text-violet-300">verified_user</span
+                <span class="material-symbols-rounded text-4xl text-indigo-300">verified_user</span
                 ><strong class="mt-2 block text-sm">Tenant izolasyonu aktif</strong
                 ><span class="text-xs text-slate-300">{{ auth.session()?.tenantName }}</span>
               </div>
@@ -80,7 +81,7 @@ import {
           <section class="odv-card p-5">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <span class="text-xs font-black uppercase tracking-wider text-violet-600"
+                <span class="text-xs font-black uppercase tracking-wider text-indigo-600"
                   >Mevcut kullanım · {{ access.planId }}</span
                 >
                 <h2 class="mb-0 mt-2 text-lg font-black">Plan kapasitesi</h2>
@@ -111,18 +112,18 @@ import {
               <h2 class="m-0 text-xl font-black">Planlar</h2>
               <p class="mb-0 mt-1 text-sm text-slate-500">Yıllık ödemede iki aylık avantaj.</p>
             </div>
-            <div class="inline-flex rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+            <div class="odv-segment" role="group" aria-label="Ödeme dönemi">
               <button
                 type="button"
-                class="rounded-lg px-4 py-2 text-xs font-bold"
-                [class.bg-white]="cycle() === 'monthly'"
+                class="odv-segment-item"
+                [attr.aria-pressed]="cycle() === 'monthly'"
                 (click)="cycle.set('monthly')"
               >
                 Aylık</button
               ><button
                 type="button"
-                class="rounded-lg px-4 py-2 text-xs font-bold"
-                [class.bg-white]="cycle() === 'yearly'"
+                class="odv-segment-item"
+                [attr.aria-pressed]="cycle() === 'yearly'"
                 (click)="cycle.set('yearly')"
               >
                 Yıllık
@@ -134,7 +135,7 @@ import {
               <article
                 class="odv-card relative p-6"
                 [class.ring-2]="index === 1"
-                [class.ring-violet-500]="index === 1"
+                [class.ring-indigo-500]="index === 1"
               >
                 @if (entitlements()?.planId === plan.id) {
                   <span
@@ -143,7 +144,7 @@ import {
                   >
                 } @else if (index === 1) {
                   <span
-                    class="absolute end-4 top-4 rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-black text-violet-700"
+                    class="absolute end-4 top-4 rounded-full bg-indigo-100 px-2.5 py-1 text-[10px] font-black text-indigo-700"
                     >ÖNERİLEN</span
                   >
                 }

@@ -10,7 +10,7 @@ import { AuthStore } from '../../core/auth/auth-store';
     <main class="mx-auto grid min-h-[70vh] max-w-4xl place-items-center px-4 py-10">
       <section class="odv-card w-full overflow-hidden">
         <div
-          class="grid gap-8 bg-gradient-to-br from-slate-950 via-violet-950 to-indigo-950 p-7 text-white md:grid-cols-[1fr_auto] md:items-center md:p-10"
+          class="grid gap-8 bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 p-7 text-white md:grid-cols-[1fr_auto] md:items-center md:p-10"
         >
           <div>
             <span class="odv-badge-warning">ERİŞİM BEKLEMEDE</span>
@@ -28,23 +28,23 @@ import { AuthStore } from '../../core/auth/auth-store';
         </div>
         <div class="grid gap-5 p-7 md:grid-cols-3 md:p-10">
           <div class="rounded-2xl bg-slate-50 p-5 dark:bg-slate-800">
-            <span class="material-symbols-rounded text-violet-600">calendar_month</span>
+            <span class="material-symbols-rounded text-indigo-600">calendar_month</span>
             <strong class="mt-3 block text-sm">Son erişim tarihi</strong>
             <span class="mt-1 block text-sm text-slate-500">{{
               auth.session()?.subscriptionEndsAt | date: 'dd.MM.yyyy'
             }}</span>
           </div>
           <div class="rounded-2xl bg-slate-50 p-5 dark:bg-slate-800">
-            <span class="material-symbols-rounded text-violet-600">database</span>
+            <span class="material-symbols-rounded text-indigo-600">database</span>
             <strong class="mt-3 block text-sm">Kayıt güvenliği</strong>
             <span class="mt-1 block text-sm text-slate-500"
               >Mevcut denetim izi değişmeden saklanır.</span
             >
           </div>
           <div class="rounded-2xl bg-slate-50 p-5 dark:bg-slate-800">
-            <span class="material-symbols-rounded text-violet-600">support_agent</span>
+            <span class="material-symbols-rounded text-indigo-600">support_agent</span>
             <strong class="mt-3 block text-sm">Yardıma mı ihtiyacınız var?</strong>
-            <a class="mt-1 block text-sm font-bold text-violet-600" href="mailto:destek@odivon.com"
+            <a class="mt-1 block text-sm font-bold text-indigo-600" href="mailto:destek@odivon.com"
               >destek@odivon.com</a
             >
           </div>

@@ -4,8 +4,8 @@
   @include mat.theme(
     (
       color: (
-        primary: mat.$violet-palette,
-        tertiary: mat.$blue-palette,
+        primary: mat.$blue-palette,
+        tertiary: mat.$violet-palette,
       ),
       typography: 'Plus Jakarta Sans',
       density: 0,
@@ -28,22 +28,25 @@ body {
 }
 body {
   background:
-    radial-gradient(circle at 82% -10%, rgb(124 58 237 / 0.09), transparent 28rem), #f8fafc;
+    radial-gradient(60rem 30rem at 100% -10%, rgb(99 102 241 / 0.07), transparent 70%), #f8fafc;
   color: #0f172a;
 }
 .dark body {
   background:
-    radial-gradient(circle at 82% -10%, rgb(124 58 237 / 0.16), transparent 30rem), #0b1120;
+    radial-gradient(60rem 30rem at 100% -10%, rgb(99 102 241 / 0.12), transparent 70%), #0b1120;
   color: #f8fafc;
 }
-button,
-input,
-select {
-  font: inherit;
-}
-button {
-  cursor: pointer;
-  border: 0;
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+  button {
+    cursor: pointer;
+    border: 0;
+  }
 }
 .material-symbols-rounded {
   font-size: 20px;
@@ -51,7 +54,22 @@ button {
 }
 .custom-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #94a3b8 transparent;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.dark .custom-scroll {
+  scrollbar-color: #334155 transparent;
+}
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 .rtl .directional-icon {
   transform: scaleX(-1);
@@ -63,11 +81,11 @@ button {
 }
 .odv-swal-confirm {
   border-radius: 0.75rem !important;
-  background: #6d28d9 !important;
+  background: #4f46e5 !important;
 }
 .odv-swal-danger {
   border-radius: 0.75rem !important;
-  background: #dc2626 !important;
+  background: #e11d48 !important;
 }
 .odv-swal-cancel {
   border-radius: 0.75rem !important;

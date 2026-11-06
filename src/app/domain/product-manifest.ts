@@ -29,12 +29,7 @@ export const PRODUCT: ProductManifest = {
   promiseKey: 'product.promise',
   apiNamespace: '/api/v1/fgas',
   accent: '#35d49a',
-  metrics: [
-    { labelKey: 'metric.total', value: '1.248', noteKey: 'metric.totalNote', tone: 'primary' },
-    { labelKey: 'metric.active', value: '92%', noteKey: 'metric.activeNote', tone: 'positive' },
-    { labelKey: 'metric.pending', value: '24', noteKey: 'metric.pendingNote', tone: 'warning' },
-    { labelKey: 'metric.score', value: '8', noteKey: 'metric.scoreNote', tone: 'info' },
-  ],
+  metrics: [],
   modules: [
     { nameKey: 'module.one', descriptionKey: 'module.oneDesc', icon: 'inventory_2', phase: 1 },
     { nameKey: 'module.two', descriptionKey: 'module.twoDesc', icon: 'event_upcoming', phase: 1 },
