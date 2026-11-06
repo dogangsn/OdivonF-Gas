@@ -18,6 +18,7 @@ interface Audit {
   imports: [PageHeader, DatePipe],
   template: `<div class="space-y-6">
     <app-page-header
+      icon="history"
       eyebrow="DEĞİŞMEZ DENETİM İZİ"
       title="Aktivite Günlüğü"
       description="Ekipman ve operasyon kayıtlarında gerçekleşen oluşturma, güncelleme, arşivleme ve geri yükleme olayları."
@@ -25,7 +26,7 @@ interface Audit {
     <section class="odv-card overflow-hidden">
       @if (loading()) {
         <div class="grid min-h-64 place-items-center">
-          <span class="material-symbols-rounded animate-spin text-4xl text-violet-600"
+          <span class="material-symbols-rounded animate-spin text-4xl text-indigo-600"
             >progress_activity</span
           >
         </div>
@@ -34,10 +35,13 @@ interface Audit {
       } @else {
         <div class="divide-y divide-slate-100 dark:divide-slate-800">
           @for (item of items(); track item.id) {
-            <article class="grid gap-4 p-5 sm:grid-cols-[auto_1fr_auto] sm:items-center">
-              <span
-                class="grid size-11 place-items-center rounded-xl bg-violet-50 text-violet-700 dark:bg-violet-500/10"
-                ><span class="material-symbols-rounded">{{ icon(item.event) }}</span></span
+            <article
+              class="odv-row grid gap-4 px-5 py-4 sm:grid-cols-[auto_1fr_auto] sm:items-center"
+            >
+              <span class="grid size-10 place-items-center rounded-xl" [class]="tone(item.event)"
+                ><span class="material-symbols-rounded !text-[20px]" aria-hidden="true">{{
+                  icon(item.event)
+                }}</span></span
               >
               <div>
                 <strong class="block text-sm">{{ label(item.event) }}</strong
@@ -92,6 +96,15 @@ export class ActivityPage {
           : e.endsWith('.restored')
             ? 'Kayıt geri yüklendi'
             : e;
+  }
+  tone(e: string) {
+    return e.endsWith('.created')
+      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300'
+      : e.endsWith('.updated')
+        ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300'
+        : e.endsWith('.archived')
+          ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300'
+          : 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-300';
   }
   icon(e: string) {
     return e.endsWith('.created')

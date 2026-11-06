@@ -11,7 +11,7 @@ import { AuthStore } from '../../core/auth/auth-store';
         aria-labelledby="verify-title"
       >
         <span
-          class="mx-auto grid size-16 place-items-center rounded-3xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300"
+          class="mx-auto grid size-16 place-items-center rounded-3xl bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"
           ><span class="material-symbols-rounded !text-3xl">mark_email_unread</span></span
         >
         <h1 id="verify-title" class="mb-3 mt-6 text-3xl font-black">
@@ -24,7 +24,7 @@ import { AuthStore } from '../../core/auth/auth-store';
         @if (message()) {
           <div
             role="status"
-            class="my-5 rounded-xl bg-violet-50 p-3 text-sm font-semibold text-violet-800 dark:bg-violet-500/10 dark:text-violet-200"
+            class="my-5 rounded-xl bg-indigo-50 p-3 text-sm font-semibold text-indigo-800 dark:bg-indigo-500/10 dark:text-indigo-200"
           >
             {{ message() }}
           </div>

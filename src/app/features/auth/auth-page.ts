@@ -19,7 +19,7 @@ import { PRODUCT } from '../../domain/product-manifest';
   template: `
     <main class="min-h-screen bg-slate-950 text-white lg:grid lg:grid-cols-[1.08fr_.92fr]">
       <section
-        class="relative hidden overflow-hidden bg-gradient-to-br from-violet-700 via-indigo-800 to-slate-950 p-12 lg:flex lg:flex-col lg:justify-between"
+        class="relative hidden overflow-hidden bg-gradient-to-br from-indigo-700 via-violet-800 to-slate-950 p-12 lg:flex lg:flex-col lg:justify-between"
       >
         <div
           class="absolute -start-20 top-20 size-80 rounded-full bg-fuchsia-400/20 blur-3xl"
@@ -30,7 +30,7 @@ import { PRODUCT } from '../../domain/product-manifest';
           >
           <div>
             <strong class="text-xl">Odivon</strong
-            ><span class="block text-xs text-violet-200">{{ product.name }}</span>
+            ><span class="block text-xs text-indigo-200">{{ product.name }}</span>
           </div>
         </div>
         <div class="relative max-w-2xl">
@@ -78,12 +78,12 @@ import { PRODUCT } from '../../domain/product-manifest';
         </label>
         <div class="w-full max-w-md">
           <div class="mb-8 flex items-center gap-3 lg:hidden">
-            <span class="grid size-10 place-items-center rounded-xl bg-violet-600 text-white"
+            <span class="grid size-10 place-items-center rounded-xl bg-indigo-600 text-white"
               ><span class="material-symbols-rounded">verified_user</span></span
             ><strong>Odivon · {{ product.name }}</strong>
           </div>
           <div class="mb-8">
-            <span class="text-xs font-extrabold uppercase tracking-[.18em] text-violet-600">{{
+            <span class="text-xs font-extrabold uppercase tracking-[.18em] text-indigo-600">{{
               (isRegister ? 'auth.newWorkspace' : 'auth.welcomeBack') | t
             }}</span>
             <h2 class="mb-2 mt-3 text-3xl font-black">
@@ -126,7 +126,7 @@ import { PRODUCT } from '../../domain/product-manifest';
             @if (!isRegister) {
               <div class="-mt-2 text-end">
                 <a
-                  class="text-xs font-bold text-violet-600 hover:underline"
+                  class="text-xs font-bold text-indigo-600 hover:underline"
                   routerLink="/forgot-password"
                   >{{ 'auth.forgot' | t }}</a
                 >
@@ -162,17 +162,17 @@ import { PRODUCT } from '../../domain/product-manifest';
                 class="flex items-start gap-3 rounded-xl bg-slate-100 p-3 text-xs leading-5 dark:bg-slate-800"
               >
                 <input
-                  class="mt-1 size-4 accent-violet-600"
+                  class="mt-1 size-4 accent-indigo-600"
                   type="checkbox"
                   [checked]="consent()"
                   (change)="consent.set($any($event.target).checked)"
                 />
                 <span
-                  ><a class="font-bold text-violet-600" href="/legal/terms" target="_blank">{{
+                  ><a class="font-bold text-indigo-600" href="/legal/terms" target="_blank">{{
                     'auth.terms' | t
                   }}</a>
                   {{ 'auth.consentJoin' | t }}
-                  <a class="font-bold text-violet-600" href="/legal/privacy" target="_blank">{{
+                  <a class="font-bold text-indigo-600" href="/legal/privacy" target="_blank">{{
                     'auth.privacy' | t
                   }}</a>
                   {{ 'auth.consentSuffix' | t }}</span
@@ -194,7 +194,7 @@ import { PRODUCT } from '../../domain/product-manifest';
           <p class="mt-6 text-center text-sm text-slate-500">
             {{ (isRegister ? 'auth.hasAccount' : 'auth.noAccount') | t }}
             <a
-              class="font-bold text-violet-600 hover:underline"
+              class="font-bold text-indigo-600 hover:underline"
               [routerLink]="isRegister ? '/login' : '/register'"
               >{{ (isRegister ? 'auth.loginLink' : 'auth.registerLink') | t }}</a
             >
