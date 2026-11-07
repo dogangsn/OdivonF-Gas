@@ -2,7 +2,7 @@
   "hosting": {
     "public": "dist/OdivonF-Gas/browser",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [{ "source": "**", "destination": "/index.html" }],
+    "rewrites": [{ "source": "**", "destination": "/index.csr.html" }],
     "headers": [
       {
         "source": "**",

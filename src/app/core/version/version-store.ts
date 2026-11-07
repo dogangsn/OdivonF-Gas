@@ -15,7 +15,7 @@ export class VersionStore {
   readonly updateRequired = signal(false);
   readonly updating = signal(false);
   start(): void {
-    if (this.timer) return;
+    if (this.timer || typeof window === 'undefined') return;
     void this.check();
     this.timer = window.setInterval(() => void this.check(), 300_000);
     this.document.addEventListener('visibilitychange', () => {

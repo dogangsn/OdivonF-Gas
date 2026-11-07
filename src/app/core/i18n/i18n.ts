@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { Injectable, Pipe, PipeTransform, computed, inject, signal } from '@angular/core';
 export type SupportedLang = 'tr' | 'en' | 'de' | 'fr' | 'es' | 'it' | 'nl' | 'ar';
 export interface LanguageOption {
@@ -428,6 +429,7 @@ const DICTS: Partial<Record<SupportedLang, Record<string, string>>> = {
 };
 @Injectable({ providedIn: 'root' })
 export class I18nStore {
+  private readonly document = inject(DOCUMENT);
   readonly currentLang = signal<SupportedLang>(this.initial());
   readonly options = LANGUAGES;
   readonly active = computed(
@@ -438,20 +440,23 @@ export class I18nStore {
   }
   setLanguage(lang: SupportedLang): void {
     this.currentLang.set(lang);
-    localStorage.setItem('odivon:preferred_lang', lang);
+    if (typeof localStorage !== 'undefined') localStorage.setItem('odivon:preferred_lang', lang);
     this.applyDocument();
   }
   t(key: string): string {
     return DICTS[this.currentLang()]?.[key] ?? TR[key] ?? key;
   }
   private initial(): SupportedLang {
+    if (typeof localStorage === 'undefined') return 'tr';
     const value = localStorage.getItem('odivon:preferred_lang') as SupportedLang | null;
     return LANGUAGES.some((x) => x.code === value) ? value! : 'tr';
   }
-  private applyDocument(): void {
-    document.documentElement.lang = this.currentLang();
-    document.documentElement.dir = this.active().dir;
-    document.documentElement.classList.toggle('rtl', this.active().dir === 'rtl');
+  /** Applies the chosen language and direction to <html>. */
+  applyDocument(): void {
+    const root = this.document.documentElement;
+    root.lang = this.currentLang();
+    root.dir = this.active().dir;
+    root.classList.toggle('rtl', this.active().dir === 'rtl');
   }
 }
 @Pipe({ name: 't', pure: false })

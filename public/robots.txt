@@ -1,2 +1,19 @@
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /verify-email
+Disallow: /onboarding
+Disallow: /overview
+Disallow: /equipment
+Disallow: /leak-checks
+Disallow: /gas-movements
+Disallow: /technicians
+Disallow: /inspections
+Disallow: /activity
+Disallow: /settings
+Disallow: /billing
+Disallow: /subscription-
+
+Sitemap: https://fgas.odivon.com/sitemap.xml

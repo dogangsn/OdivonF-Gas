@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { VersionStore } from './core/version/version-store';
 import { I18nStore, TranslatePipe } from './core/i18n/i18n';
+import { SeoService } from './core/seo/seo';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +32,7 @@ export class App {
   readonly version = inject(VersionStore);
   constructor() {
     inject(I18nStore);
+    inject(SeoService).start();
     this.version.start();
   }
 }

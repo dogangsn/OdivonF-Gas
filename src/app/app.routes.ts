@@ -6,8 +6,10 @@ import {
   pendingVerificationGuard,
 } from './core/auth/auth.guard';
 import { PRODUCT_NAVIGATION } from './domain/domain-navigation';
+import { MARKETING_ROUTES } from './features/marketing/marketing.routes';
 
 export const routes: Routes = [
+  ...MARKETING_ROUTES,
   {
     path: 'login',
     loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage),
@@ -31,12 +33,26 @@ export const routes: Routes = [
   {
     path: 'legal/terms',
     loadComponent: () => import('./features/legal/legal-page').then((m) => m.LegalPage),
-    data: { document: 'terms' },
+    data: {
+      document: 'terms',
+      seo: {
+        title: 'Kullanım Koşulları | Odivon F-Gas',
+        description: 'Odivon F-Gas SaaS kullanım koşulları.',
+        path: '/legal/terms',
+      },
+    },
   },
   {
     path: 'legal/privacy',
     loadComponent: () => import('./features/legal/legal-page').then((m) => m.LegalPage),
-    data: { document: 'privacy' },
+    data: {
+      document: 'privacy',
+      seo: {
+        title: 'Gizlilik ve KVKK Bildirimi | Odivon F-Gas',
+        description: 'Odivon F-Gas gizlilik, KVKK ve veri işleme bildirimi.',
+        path: '/legal/privacy',
+      },
+    },
   },
   {
     path: 'onboarding',
