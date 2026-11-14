@@ -49,7 +49,7 @@ const PLAN_DETAILS = [
   imports: [RouterLink, CurrencyPipe, MarketingFaq],
   template: `
     <section class="mx-auto max-w-7xl px-4 pb-6 pt-14 text-center sm:px-6">
-      <span class="text-xs font-bold uppercase tracking-wider text-brand-600">Fiyatlar</span>
+      <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Fiyatlar</span>
       <h1
         class="mx-auto mt-2 max-w-3xl text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white"
       >
@@ -84,7 +84,7 @@ const PLAN_DETAILS = [
         <article
           class="odv-card flex flex-col p-7"
           [class.ring-2]="index === 1"
-          [class.ring-brand-500]="index === 1"
+          [class.ring-indigo-500]="index === 1"
         >
           <div class="flex items-center justify-between">
             <h2 class="text-xl font-black text-slate-900 dark:text-white">{{ plan.name }}</h2>
@@ -121,7 +121,7 @@ const PLAN_DETAILS = [
           <a
             routerLink="/register"
             class="justify-center"
-            [class.odv-btn-brand]="index === 1"
+            [class.odv-btn-primary]="index === 1"
             [class.odv-btn-soft]="index !== 1"
             >14 gün ücretsiz deneyin</a
           >

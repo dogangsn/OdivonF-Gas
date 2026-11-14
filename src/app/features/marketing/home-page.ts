@@ -9,13 +9,17 @@ import { HOME_FAQ } from './marketing-faq-content';
   imports: [RouterLink, MarketingCta, MarketingFaq],
   template: `
     <!-- Hero -->
-    <section class="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0b1120]">
+    <section class="relative overflow-hidden">
       <div
-        class="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:pb-20 lg:pt-16"
+        class="pointer-events-none absolute -top-40 end-[-10rem] size-[36rem] rounded-full bg-indigo-400/20 blur-3xl dark:bg-indigo-600/20"
+        aria-hidden="true"
+      ></div>
+      <div
+        class="relative mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:pb-20 lg:pt-16"
       >
         <div>
           <span
-            class="inline-flex items-center gap-2 rounded-md border border-brand-200 bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-800 dark:border-brand-800 dark:bg-brand-950 dark:text-brand-200"
+            class="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/60 dark:text-indigo-300"
           >
             <span class="material-symbols-rounded text-[16px]" aria-hidden="true">gavel</span>
             AB 2024/573 F-Gas Tüzüğü Madde 5 kuralları
@@ -24,7 +28,10 @@ import { HOME_FAQ } from './marketing-faq-content';
             class="mt-5 text-4xl font-black leading-[1.1] tracking-tight text-slate-900 sm:text-5xl dark:text-white"
           >
             F-Gas takip yazılımı:
-            <span class="text-brand-700 dark:text-brand-300">denetime her gün hazır olun.</span>
+            <span
+              class="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent"
+              >denetime her gün hazır olun.</span
+            >
           </h1>
           <p class="mt-5 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300">
             Soğutma ve klima ekipmanlarınızın gaz yükünü, sızıntı kontrol tarihlerini, gaz
@@ -33,7 +40,7 @@ import { HOME_FAQ } from './marketing-faq-content';
             hesaplansın.
           </p>
           <div class="mt-8 flex flex-wrap gap-3">
-            <a routerLink="/register" class="odv-btn-brand px-6 py-3 text-base"
+            <a routerLink="/register" class="odv-btn-primary px-6 py-3 text-base"
               >14 gün ücretsiz deneyin</a
             >
             <a [href]="demoMail" class="odv-btn-secondary px-6 py-3 text-base">Demo isteyin</a>
@@ -43,7 +50,9 @@ import { HOME_FAQ } from './marketing-faq-content';
           >
             @for (item of heroNotes; track item) {
               <li class="flex items-center gap-1.5">
-                <span class="material-symbols-rounded text-[16px] text-brand-600" aria-hidden="true"
+                <span
+                  class="material-symbols-rounded text-[16px] text-indigo-600"
+                  aria-hidden="true"
                   >check</span
                 >{{ item }}
               </li>
@@ -53,7 +62,7 @@ import { HOME_FAQ } from './marketing-faq-content';
 
         <!-- Product preview: the check schedule the app keeps for you -->
         <figure
-          class="m-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_24px_60px_-28px_rgba(15,23,42,.35)] dark:border-slate-700 dark:bg-slate-900"
+          class="m-0 overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900"
           aria-label="Örnek kontrol takvimi"
         >
           <div
@@ -65,10 +74,10 @@ import { HOME_FAQ } from './marketing-faq-content';
             </div>
             <div class="flex gap-1.5 text-[11px] font-bold">
               <span
-                class="rounded-md bg-rose-50 px-2 py-1 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
+                class="rounded-full bg-rose-50 px-2.5 py-1 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
                 >2 gecikmiş</span
               ><span
-                class="rounded-md bg-amber-50 px-2 py-1 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                class="rounded-full bg-amber-50 px-2.5 py-1 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
                 >5 bu ay</span
               >
             </div>
@@ -119,14 +128,17 @@ import { HOME_FAQ } from './marketing-faq-content';
     </section>
 
     <!-- Trust strip -->
-    <section class="bg-slate-50 dark:bg-slate-950/40" aria-label="Güvence">
+    <section
+      class="border-y border-slate-200/80 bg-white/70 dark:border-slate-800 dark:bg-slate-900/40"
+      aria-label="Güvence"
+    >
       <ul
         class="mx-auto grid max-w-7xl gap-4 px-4 py-8 text-sm sm:grid-cols-2 sm:px-6 lg:grid-cols-4"
       >
         @for (item of trust; track item.title) {
           <li class="flex items-start gap-3">
             <span
-              class="material-symbols-rounded text-brand-700 dark:text-brand-300"
+              class="material-symbols-rounded text-indigo-700 dark:text-indigo-300"
               aria-hidden="true"
               >{{ item.icon }}</span
             >
@@ -141,7 +153,7 @@ import { HOME_FAQ } from './marketing-faq-content';
 
     <!-- Excel vs Odivon -->
     <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-      <span class="text-xs font-bold uppercase tracking-wider text-brand-700 dark:text-brand-300"
+      <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300"
         >Neden Excel değil?</span
       >
       <h2
@@ -149,7 +161,7 @@ import { HOME_FAQ } from './marketing-faq-content';
       >
         Tablo kayıt tutar. Odivon F-Gas takvimi sizin yerinize tutar.
       </h2>
-      <div class="mt-10 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+      <div class="odv-card mt-10 overflow-x-auto">
         <table class="w-full min-w-[36rem] text-sm">
           <caption class="sr-only">
             Excel ile Odivon F-Gas karşılaştırması
@@ -179,7 +191,7 @@ import { HOME_FAQ } from './marketing-faq-content';
                 <td class="odv-td text-slate-700 dark:text-slate-200">
                   <span class="flex items-start gap-2"
                     ><span
-                      class="material-symbols-rounded text-[18px] text-brand-600 dark:text-brand-300"
+                      class="material-symbols-rounded text-[18px] text-indigo-600 dark:text-indigo-300"
                       aria-hidden="true"
                       >check</span
                     >{{ row.odivon }}</span
@@ -197,7 +209,8 @@ import { HOME_FAQ } from './marketing-faq-content';
       class="border-y border-slate-200 bg-white py-16 dark:border-slate-800 dark:bg-slate-900/40"
     >
       <div class="mx-auto max-w-7xl px-4 sm:px-6">
-        <span class="text-xs font-bold uppercase tracking-wider text-brand-700 dark:text-brand-300"
+        <span
+          class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300"
           >Nasıl çalışır?</span
         >
         <h2
@@ -207,9 +220,9 @@ import { HOME_FAQ } from './marketing-faq-content';
         </h2>
         <ol class="mt-10 grid gap-5 md:grid-cols-3">
           @for (step of steps; track step.title; let index = $index) {
-            <li class="rounded-xl border border-slate-200 p-6 dark:border-slate-800">
+            <li class="odv-card p-6">
               <span
-                class="grid size-9 place-items-center rounded-md bg-brand-700 text-sm font-black text-white"
+                class="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-black text-white shadow-md shadow-indigo-500/25"
                 >{{ index + 1 }}</span
               >
               <h3 class="mt-4 text-lg font-black text-slate-900 dark:text-white">
@@ -226,7 +239,7 @@ import { HOME_FAQ } from './marketing-faq-content';
 
     <!-- Modules -->
     <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-      <span class="text-xs font-bold uppercase tracking-wider text-brand-700 dark:text-brand-300"
+      <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300"
         >Modüller</span
       >
       <h2
@@ -238,9 +251,10 @@ import { HOME_FAQ } from './marketing-faq-content';
         @for (item of modules; track item.title) {
           <article class="flex gap-4">
             <span
-              class="material-symbols-rounded mt-0.5 text-brand-700 dark:text-brand-300"
-              aria-hidden="true"
-              >{{ item.icon }}</span
+              class="grid size-11 shrink-0 place-items-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300"
+              ><span class="material-symbols-rounded" aria-hidden="true">{{
+                item.icon
+              }}</span></span
             >
             <div>
               <h3 class="text-base font-black text-slate-900 dark:text-white">{{ item.title }}</h3>
@@ -253,7 +267,7 @@ import { HOME_FAQ } from './marketing-faq-content';
       </div>
       <a
         routerLink="/ozellikler"
-        class="mt-10 inline-flex items-center gap-1 text-sm font-bold text-brand-700 dark:text-brand-300"
+        class="mt-10 inline-flex items-center gap-1 text-sm font-bold text-indigo-700 dark:text-indigo-300"
         >Tüm özellikleri inceleyin
         <span class="material-symbols-rounded directional-icon text-[18px]" aria-hidden="true"
           >arrow_forward</span
@@ -266,7 +280,7 @@ import { HOME_FAQ } from './marketing-faq-content';
       <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2">
         <div>
           <span
-            class="text-xs font-bold uppercase tracking-wider text-brand-700 dark:text-brand-300"
+            class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300"
             >Otomatik kontrol periyodu</span
           >
           <h2
@@ -279,13 +293,11 @@ import { HOME_FAQ } from './marketing-faq-content';
             bulur, F-Gas Tüzüğü Madde 5’teki eşiklere göre kontrol periyodunu belirler ve son
             kontrolden bir sonraki tarihi planlar.
           </p>
-          <a routerLink="/araclar/co2-esdegeri-hesaplama" class="odv-btn-brand mt-6 inline-flex"
+          <a routerLink="/araclar/co2-esdegeri-hesaplama" class="odv-btn-primary mt-6 inline-flex"
             >Ücretsiz CO2e hesaplayıcı</a
           >
         </div>
-        <div
-          class="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
-        >
+        <div class="odv-card overflow-hidden">
           <table class="w-full text-sm">
             <caption class="sr-only">
               CO2 eşdeğerine göre sızıntı kontrol periyotları
@@ -317,8 +329,9 @@ import { HOME_FAQ } from './marketing-faq-content';
 
     <!-- Audience -->
     <section class="mx-auto grid max-w-7xl gap-5 px-4 py-16 sm:px-6 md:grid-cols-2">
-      <article class="rounded-xl border border-slate-200 p-8 dark:border-slate-800">
-        <span class="text-xs font-bold uppercase tracking-wider text-brand-700 dark:text-brand-300"
+      <article class="odv-card p-8">
+        <span
+          class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300"
           >Servis firmaları için</span
         >
         <h2 class="mt-2 text-2xl font-black text-slate-900 dark:text-white">
@@ -330,12 +343,13 @@ import { HOME_FAQ } from './marketing-faq-content';
         </p>
         <a
           routerLink="/servis-firmalari"
-          class="mt-5 inline-flex text-sm font-bold text-brand-700 dark:text-brand-300"
+          class="mt-5 inline-flex text-sm font-bold text-indigo-700 dark:text-indigo-300"
           >Servis firmaları için F-Gas takibi</a
         >
       </article>
-      <article class="rounded-xl border border-slate-200 p-8 dark:border-slate-800">
-        <span class="text-xs font-bold uppercase tracking-wider text-brand-700 dark:text-brand-300"
+      <article class="odv-card p-8">
+        <span
+          class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300"
           >İşletmeler için</span
         >
         <h2 class="mt-2 text-2xl font-black text-slate-900 dark:text-white">
@@ -347,7 +361,7 @@ import { HOME_FAQ } from './marketing-faq-content';
         </p>
         <a
           routerLink="/fiyatlar"
-          class="mt-5 inline-flex text-sm font-bold text-brand-700 dark:text-brand-300"
+          class="mt-5 inline-flex text-sm font-bold text-indigo-700 dark:text-indigo-300"
           >Planları karşılaştırın</a
         >
       </article>
@@ -401,7 +415,7 @@ export class HomePage {
       period: '12 ayda bir',
       due: '14 Mar 2027',
       state: 'Uygun',
-      badge: 'text-xs font-bold text-brand-700 dark:text-brand-300',
+      badge: 'text-xs font-bold text-indigo-700 dark:text-indigo-300',
     },
   ] as const;
   readonly trust = [

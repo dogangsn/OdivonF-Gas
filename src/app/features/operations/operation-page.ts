@@ -162,7 +162,7 @@ const CONFIG: Record<
         </div>
         @if (loading()) {
           <div class="grid min-h-64 place-items-center" role="status">
-            <span class="material-symbols-rounded animate-spin text-4xl text-brand-600"
+            <span class="material-symbols-rounded animate-spin text-4xl text-indigo-600"
               >progress_activity</span
             >
           </div>
@@ -247,7 +247,7 @@ const CONFIG: Record<
                   <tr>
                     <td colspan="6" class="p-14 text-center">
                       <span
-                        class="mx-auto grid size-14 place-items-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-500/10 dark:text-brand-300"
+                        class="mx-auto grid size-14 place-items-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-300"
                         ><span class="material-symbols-rounded !text-3xl" aria-hidden="true">{{
                           config.icon
                         }}</span></span
@@ -463,7 +463,7 @@ export class OperationPage {
       value: this.rows().length,
       note: 'MainAPI ile senkronize',
       icon: this.config.icon,
-      iconClass: 'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300',
+      iconClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300',
       valueClass: '',
     },
     {

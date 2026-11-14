@@ -25,7 +25,7 @@ import {
       />
       @if (loading()) {
         <div class="odv-card grid min-h-72 place-items-center">
-          <span class="material-symbols-rounded animate-spin text-5xl text-brand-600"
+          <span class="material-symbols-rounded animate-spin text-5xl text-indigo-600"
             >progress_activity</span
           >
         </div>
@@ -37,7 +37,9 @@ import {
         </div>
       } @else {
         @if (status(); as state) {
-          <section class="odv-card overflow-hidden bg-brand-950 p-6 text-white lg:p-8">
+          <section
+            class="odv-card overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 p-6 text-white lg:p-8"
+          >
             <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
                 <span
@@ -68,7 +70,7 @@ import {
                 </p>
               </div>
               <div class="rounded-2xl bg-white/10 p-5 text-center">
-                <span class="material-symbols-rounded text-4xl text-brand-300">verified_user</span
+                <span class="material-symbols-rounded text-4xl text-indigo-300">verified_user</span
                 ><strong class="mt-2 block text-sm">Tenant izolasyonu aktif</strong
                 ><span class="text-xs text-slate-300">{{ auth.session()?.tenantName }}</span>
               </div>
@@ -79,7 +81,7 @@ import {
           <section class="odv-card p-5">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <span class="text-xs font-black uppercase tracking-wider text-brand-600"
+                <span class="text-xs font-black uppercase tracking-wider text-indigo-600"
                   >Mevcut kullanım · {{ access.planId }}</span
                 >
                 <h2 class="mb-0 mt-2 text-lg font-black">Plan kapasitesi</h2>
@@ -133,7 +135,7 @@ import {
               <article
                 class="odv-card relative p-6"
                 [class.ring-2]="index === 1"
-                [class.ring-brand-500]="index === 1"
+                [class.ring-indigo-500]="index === 1"
               >
                 @if (entitlements()?.planId === plan.id) {
                   <span
@@ -142,7 +144,7 @@ import {
                   >
                 } @else if (index === 1) {
                   <span
-                    class="absolute end-4 top-4 rounded-full bg-brand-100 px-2.5 py-1 text-[10px] font-black text-brand-700"
+                    class="absolute end-4 top-4 rounded-full bg-indigo-100 px-2.5 py-1 text-[10px] font-black text-indigo-700"
                     >ÖNERİLEN</span
                   >
                 }

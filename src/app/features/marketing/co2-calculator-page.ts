@@ -28,7 +28,7 @@ export function refrigerantLabel(key: string): string {
   imports: [DecimalPipe, RouterLink, MarketingCta, MarketingFaq],
   template: `
     <section class="mx-auto max-w-7xl px-4 pb-6 pt-14 sm:px-6">
-      <span class="text-xs font-bold uppercase tracking-wider text-brand-600">Ücretsiz araç</span>
+      <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Ücretsiz araç</span>
       <h1
         class="mt-2 max-w-3xl text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white"
       >
@@ -68,7 +68,7 @@ export function refrigerantLabel(key: string): string {
           <label class="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-200">
             <input
               type="checkbox"
-              class="size-4 accent-brand-600"
+              class="size-4 accent-indigo-600"
               [checked]="hermetic()"
               (change)="hermetic.set($any($event.target).checked)"
             />
@@ -77,7 +77,7 @@ export function refrigerantLabel(key: string): string {
           <label class="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-200">
             <input
               type="checkbox"
-              class="size-4 accent-brand-600"
+              class="size-4 accent-indigo-600"
               [checked]="detection()"
               (change)="detection.set($any($event.target).checked)"
             />
@@ -86,32 +86,35 @@ export function refrigerantLabel(key: string): string {
         </fieldset>
       </form>
 
-      <div class="rounded-3xl bg-brand-900 p-6 text-white sm:p-8" aria-live="polite">
-        <span class="text-xs font-bold uppercase tracking-wider text-brand-200">Sonuç</span>
+      <div
+        class="rounded-3xl bg-gradient-to-br from-indigo-700 via-violet-800 to-slate-950 p-6 text-white sm:p-8"
+        aria-live="polite"
+      >
+        <span class="text-xs font-bold uppercase tracking-wider text-indigo-200">Sonuç</span>
         <div class="mt-5 grid grid-cols-2 gap-4">
           <div class="rounded-2xl bg-white/10 p-5">
-            <span class="text-xs font-bold uppercase tracking-wider text-brand-200">GWP</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-200">GWP</span>
             <strong class="mt-2 block text-3xl font-black">{{
               gwp() | number: '1.0-3' : 'tr-TR'
             }}</strong>
           </div>
           <div class="rounded-2xl bg-white/10 p-5">
-            <span class="text-xs font-bold uppercase tracking-wider text-brand-200">Ton CO2e</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-200">Ton CO2e</span>
             <strong class="mt-2 block text-3xl font-black">{{
               tonnes() | number: '1.0-3' : 'tr-TR'
             }}</strong>
           </div>
         </div>
         <div class="mt-4 rounded-2xl bg-white/10 p-5">
-          <span class="text-xs font-bold uppercase tracking-wider text-brand-200"
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-200"
             >Sızıntı kontrolü</span
           >
           <strong class="mt-2 block text-2xl font-black">{{ intervalText() }}</strong>
-          <p class="mt-2 text-sm leading-6 text-brand-100">{{ intervalNote() }}</p>
+          <p class="mt-2 text-sm leading-6 text-indigo-100">{{ intervalNote() }}</p>
         </div>
         <a
           routerLink="/register"
-          class="mt-6 inline-flex items-center rounded-xl bg-white px-5 py-3 text-sm font-black text-brand-700"
+          class="mt-6 inline-flex items-center rounded-xl bg-white px-5 py-3 text-sm font-black text-indigo-700"
           >Tüm ekipmanlarınızı otomatik takip edin</a
         >
       </div>

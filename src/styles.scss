@@ -4,8 +4,8 @@
   @include mat.theme(
     (
       color: (
-        primary: mat.$cyan-palette,
-        tertiary: mat.$azure-palette,
+        primary: mat.$blue-palette,
+        tertiary: mat.$violet-palette,
       ),
       typography: 'Plus Jakarta Sans',
       density: 0,
@@ -27,11 +27,13 @@ body {
   margin: 0;
 }
 body {
-  background: #f8fafc;
+  background:
+    radial-gradient(60rem 30rem at 100% -10%, rgb(99 102 241 / 0.07), transparent 70%), #f8fafc;
   color: #0f172a;
 }
 .dark body {
-  background: #0b1120;
+  background:
+    radial-gradient(60rem 30rem at 100% -10%, rgb(99 102 241 / 0.12), transparent 70%), #0b1120;
   color: #f8fafc;
 }
 @layer base {
@@ -79,7 +81,7 @@ body {
 }
 .odv-swal-confirm {
   border-radius: 0.75rem !important;
-  background: #145862 !important;
+  background: #4f46e5 !important;
 }
 .odv-swal-danger {
   border-radius: 0.75rem !important;

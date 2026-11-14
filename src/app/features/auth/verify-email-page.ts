@@ -11,7 +11,7 @@ import { AuthStore } from '../../core/auth/auth-store';
         aria-labelledby="verify-title"
       >
         <span
-          class="mx-auto grid size-16 place-items-center rounded-3xl bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
+          class="mx-auto grid size-16 place-items-center rounded-3xl bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"
           ><span class="material-symbols-rounded !text-3xl">mark_email_unread</span></span
         >
         <h1 id="verify-title" class="mb-3 mt-6 text-3xl font-black">
@@ -24,7 +24,7 @@ import { AuthStore } from '../../core/auth/auth-store';
         @if (message()) {
           <div
             role="status"
-            class="my-5 rounded-xl bg-brand-50 p-3 text-sm font-semibold text-brand-800 dark:bg-brand-500/10 dark:text-brand-200"
+            class="my-5 rounded-xl bg-indigo-50 p-3 text-sm font-semibold text-indigo-800 dark:bg-indigo-500/10 dark:text-indigo-200"
           >
             {{ message() }}
           </div>
@@ -38,7 +38,7 @@ import { AuthStore } from '../../core/auth/auth-store';
           </div>
         }
         <div class="mt-7 grid gap-3 sm:grid-cols-2">
-          <button type="button" class="odv-btn-brand" [disabled]="busy()" (click)="check()">
+          <button type="button" class="odv-btn-primary" [disabled]="busy()" (click)="check()">
             <span class="material-symbols-rounded">refresh</span>Doğrulamayı kontrol et
           </button>
           <button

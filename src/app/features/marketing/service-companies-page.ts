@@ -8,7 +8,7 @@ import { SERVICE_FAQ } from './marketing-faq-content';
   imports: [MarketingCta, MarketingFaq],
   template: `
     <section class="mx-auto max-w-7xl px-4 pb-10 pt-14 sm:px-6">
-      <span class="text-xs font-bold uppercase tracking-wider text-brand-600"
+      <span class="text-xs font-bold uppercase tracking-wider text-indigo-600"
         >Klima ve soğutma servis firmaları</span
       >
       <h1
@@ -44,7 +44,7 @@ import { SERVICE_FAQ } from './marketing-faq-content';
         @for (step of steps; track step.title; let i = $index) {
           <li class="odv-card p-6">
             <span
-              class="grid size-9 place-items-center rounded-full bg-brand-600 text-sm font-black text-white"
+              class="grid size-9 place-items-center rounded-full bg-indigo-600 text-sm font-black text-white"
               >{{ i + 1 }}</span
             >
             <h3 class="mt-4 text-base font-black text-slate-900 dark:text-white">

@@ -42,10 +42,10 @@ const DAY = 24 * 60 * 60 * 1000;
 
     @if (loading()) {
       <div class="space-y-5" role="status" aria-label="Takvim yükleniyor">
-        <div class="h-24 animate-pulse rounded-xl bg-slate-200/70 dark:bg-slate-800"></div>
+        <div class="h-24 animate-pulse rounded-2xl bg-slate-200/70 dark:bg-slate-800"></div>
         <div class="grid gap-5 lg:grid-cols-[1fr_22rem]">
-          <div class="h-96 animate-pulse rounded-xl bg-slate-200/70 dark:bg-slate-800"></div>
-          <div class="h-96 animate-pulse rounded-xl bg-slate-200/70 dark:bg-slate-800"></div>
+          <div class="h-96 animate-pulse rounded-2xl bg-slate-200/70 dark:bg-slate-800"></div>
+          <div class="h-96 animate-pulse rounded-2xl bg-slate-200/70 dark:bg-slate-800"></div>
         </div>
       </div>
     } @else if (error()) {
@@ -64,21 +64,22 @@ const DAY = 24 * 60 * 60 * 1000;
       </div>
     } @else if (dashboard(); as d) {
       <div class="space-y-5">
-        <!-- Summary strip -->
-        <section
-          class="odv-card grid grid-cols-2 divide-slate-200 lg:grid-cols-4 lg:divide-x dark:divide-slate-800"
-          aria-label="Özet"
-        >
+        <!-- KPI cards -->
+        <section class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4" aria-label="Temel göstergeler">
           @for (stat of stats(); track stat.label) {
-            <a
-              [routerLink]="stat.link"
-              class="block p-5 hover:bg-slate-50 dark:hover:bg-slate-800/40"
-            >
-              <span class="odv-kpi-label">{{ stat.label }}</span>
-              <strong class="mt-1.5 block text-2xl font-black tracking-tight" [class]="stat.tone">{{
-                stat.value
-              }}</strong>
-              <span class="text-xs text-slate-500 dark:text-slate-400">{{ stat.note }}</span>
+            <a [routerLink]="stat.link" class="odv-kpi group hover:-translate-y-0.5">
+              <div class="flex items-center justify-between">
+                <span class="odv-kpi-label">{{ stat.label }}</span>
+                <span class="odv-kpi-icon" [class]="stat.iconClass"
+                  ><span class="material-symbols-rounded" aria-hidden="true">{{
+                    stat.icon
+                  }}</span></span
+                >
+              </div>
+              <strong class="odv-kpi-value" [class]="stat.tone">{{ stat.value }}</strong>
+              <span class="mt-1.5 block text-xs font-semibold text-slate-500 dark:text-slate-400">{{
+                stat.note
+              }}</span>
             </a>
           }
         </section>
@@ -112,21 +113,21 @@ const DAY = 24 * 60 * 60 * 1000;
                 <ol class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
                   <li class="flex gap-3">
                     <span
-                      class="grid size-6 shrink-0 place-items-center rounded-md bg-brand-700 text-xs font-black text-white"
+                      class="grid size-6 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-black text-white"
                       >1</span
                     >
                     Ekipmanı gaz türü ve kilogramıyla ekleyin; CO₂e ve periyot otomatik hesaplanır.
                   </li>
                   <li class="flex gap-3">
                     <span
-                      class="grid size-6 shrink-0 place-items-center rounded-md bg-brand-700 text-xs font-black text-white"
+                      class="grid size-6 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-black text-white"
                       >2</span
                     >
                     Son kontrol tarihini girin; bir sonraki kontrol buraya düşer.
                   </li>
                   <li class="flex gap-3">
                     <span
-                      class="grid size-6 shrink-0 place-items-center rounded-md bg-brand-700 text-xs font-black text-white"
+                      class="grid size-6 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-black text-white"
                       >3</span
                     >
                     Kontrolü yapınca sonucu kaydedin; takvim kendiliğinden ilerler.
@@ -228,7 +229,7 @@ const DAY = 24 * 60 * 60 * 1000;
                         class="material-symbols-rounded !text-[20px]"
                         [class]="
                           item.ok
-                            ? 'text-brand-600 dark:text-brand-300'
+                            ? 'text-indigo-600 dark:text-indigo-300'
                             : 'text-amber-600 dark:text-amber-400'
                         "
                         aria-hidden="true"
@@ -264,7 +265,7 @@ const DAY = 24 * 60 * 60 * 1000;
               </dl>
               <a
                 routerLink="/gas-movements"
-                class="mt-4 inline-flex items-center gap-1 text-xs font-bold text-brand-700 dark:text-brand-300"
+                class="mt-4 inline-flex items-center gap-1 text-xs font-bold text-indigo-700 dark:text-indigo-300"
                 >Gaz defteri<span
                   class="material-symbols-rounded !text-base directional-icon"
                   aria-hidden="true"
@@ -354,6 +355,8 @@ export class OverviewPage {
     return [
       {
         label: 'Gecikmiş kontrol',
+        icon: 'event_busy',
+        iconClass: 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300',
         value: c.overdue,
         note: c.overdue ? 'Yasal tarihi geçti' : 'Takvim güncel',
         tone: c.overdue ? '!text-rose-600 dark:!text-rose-400' : '',
@@ -361,6 +364,8 @@ export class OverviewPage {
       },
       {
         label: '30 gün içinde',
+        icon: 'event_upcoming',
+        iconClass: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300',
         value: c.week + c.month,
         note: `${c.week} tanesi bu hafta`,
         tone: c.week ? '!text-amber-600 dark:!text-amber-400' : '',
@@ -368,6 +373,8 @@ export class OverviewPage {
       },
       {
         label: 'Ekipman',
+        icon: 'precision_manufacturing',
+        iconClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300',
         value: d.totalEquipment,
         note: `${d.activeEquipment} aktif`,
         tone: '',
@@ -375,6 +382,8 @@ export class OverviewPage {
       },
       {
         label: 'CO₂ eşdeğeri',
+        icon: 'eco',
+        iconClass: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300',
         value: new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 }).format(
           d.co2EquivalentTonnes,
         ),
@@ -454,7 +463,7 @@ export class OverviewPage {
     return {
       overdue: 'bg-rose-500',
       week: 'bg-amber-400',
-      month: 'bg-brand-400',
+      month: 'bg-indigo-400',
       later: 'bg-slate-200 dark:bg-slate-700',
     }[bucket];
   }

@@ -16,7 +16,7 @@ export const MARKETING_NAV = [
   template: `
     <a
       href="#icerik"
-      class="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-brand-700"
+      class="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-indigo-700"
       >İçeriğe geç</a
     >
     <header
@@ -27,7 +27,8 @@ export const MARKETING_NAV = [
         aria-label="Ana menü"
       >
         <a routerLink="/" class="flex items-center gap-2.5" aria-label="Odivon F-Gas ana sayfa">
-          <span class="grid size-9 place-items-center rounded-lg bg-brand-700 text-white"
+          <span
+            class="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25"
             ><span class="material-symbols-rounded text-[20px]" aria-hidden="true"
               >verified_user</span
             ></span
@@ -36,7 +37,7 @@ export const MARKETING_NAV = [
             <strong class="block text-base font-black text-slate-900 dark:text-white"
               >Odivon</strong
             >
-            <span class="block text-[11px] font-bold text-brand-600 dark:text-brand-400"
+            <span class="block text-[11px] font-bold text-indigo-600 dark:text-indigo-400"
               >F-Gas</span
             >
           </span>
@@ -46,7 +47,7 @@ export const MARKETING_NAV = [
             <li>
               <a
                 [routerLink]="item.path"
-                routerLinkActive="bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300"
+                routerLinkActive="bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300"
                 class="rounded-lg px-3 py-2 text-sm font-bold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
                 >{{ item.label }}</a
               >
@@ -55,7 +56,7 @@ export const MARKETING_NAV = [
         </ul>
         <div class="hidden items-center gap-2 lg:flex">
           <a routerLink="/login" class="odv-btn-ghost">Giriş yap</a>
-          <a routerLink="/register" class="odv-btn-brand">Ücretsiz hesap aç</a>
+          <a routerLink="/register" class="odv-btn-primary">Ücretsiz hesap aç</a>
         </div>
         <button
           type="button"
@@ -89,7 +90,7 @@ export const MARKETING_NAV = [
           </ul>
           <div class="mt-3 grid grid-cols-2 gap-2">
             <a routerLink="/login" class="odv-btn-secondary justify-center">Giriş yap</a>
-            <a routerLink="/register" class="odv-btn-brand justify-center">Hesap aç</a>
+            <a routerLink="/register" class="odv-btn-primary justify-center">Hesap aç</a>
           </div>
         </div>
       }
@@ -115,7 +116,7 @@ export const MARKETING_NAV = [
               <li>
                 <a
                   [routerLink]="item.path"
-                  class="text-slate-600 hover:text-brand-600 dark:text-slate-300"
+                  class="text-slate-600 hover:text-indigo-600 dark:text-slate-300"
                   >{{ item.label }}</a
                 >
               </li>
@@ -128,28 +129,28 @@ export const MARKETING_NAV = [
             <li>
               <a
                 routerLink="/legal/privacy"
-                class="text-slate-600 hover:text-brand-600 dark:text-slate-300"
+                class="text-slate-600 hover:text-indigo-600 dark:text-slate-300"
                 >Gizlilik ve KVKK</a
               >
             </li>
             <li>
               <a
                 routerLink="/legal/terms"
-                class="text-slate-600 hover:text-brand-600 dark:text-slate-300"
+                class="text-slate-600 hover:text-indigo-600 dark:text-slate-300"
                 >Kullanım koşulları</a
               >
             </li>
             <li>
               <a
                 href="mailto:destek@odivon.com"
-                class="text-slate-600 hover:text-brand-600 dark:text-slate-300"
+                class="text-slate-600 hover:text-indigo-600 dark:text-slate-300"
                 >destek@odivon.com</a
               >
             </li>
             <li>
               <a
                 href="https://odivon.com"
-                class="text-slate-600 hover:text-brand-600 dark:text-slate-300"
+                class="text-slate-600 hover:text-indigo-600 dark:text-slate-300"
                 >Odivon</a
               >
             </li>
