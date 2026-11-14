@@ -19,7 +19,7 @@
   --color-danger-50: #fff1f2;
   --color-danger-600: #e11d48;
   --color-surface-dark: #0b1120;
-  --animate-fade-up: fade-up 0.35s ease-out both;
+  --animate-fade-up: fade-up 0.35s ease-out backwards;
 
   @keyframes fade-up {
     from {

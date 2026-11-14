@@ -103,6 +103,17 @@ export function leakCheckIntervalMonths(input: {
   return (base * 2) as LeakCheckInterval;
 }
 
+/** Adds whole months to an ISO date and returns YYYY-MM-DD (same rule as MainAPI). */
+export function addMonths(isoDate: string, months: number): string {
+  const date = new Date(isoDate);
+  const day = date.getUTCDate();
+  date.setUTCDate(1);
+  date.setUTCMonth(date.getUTCMonth() + months);
+  const lastDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+  date.setUTCDate(Math.min(day, lastDay));
+  return date.toISOString().slice(0, 10);
+}
+
 /** Refrigerants offered in the calculator, most common first. */
 export const CALCULATOR_REFRIGERANTS = [
   'R32',

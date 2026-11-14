@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import {
   FormField,
   form,
@@ -18,8 +18,15 @@ import {
   FgasApiError,
   FgasEquipment,
   FgasEquipmentApi,
+  EquipmentPayload,
   InspectionInterval,
 } from './fgas-equipment.api';
+import {
+  addMonths,
+  co2EquivalentTonnes,
+  leakCheckIntervalMonths,
+  refrigerantGwp,
+} from '../marketing/refrigerants';
 
 const EMPTY_DRAFT: EquipmentDraft = {
   name: '',
@@ -373,23 +380,54 @@ const EMPTY_DRAFT: EquipmentDraft = {
               class="odv-input"
               type="number"
               step="0.001"
-              [formField]="equipmentForm.refrigerantChargeKg" /></label
-          ><label
-            ><span class="mb-1.5 block text-xs font-bold">CO₂ eşdeğeri (ton)</span
-            ><input
-              class="odv-input"
-              type="number"
-              step="0.001"
-              [formField]="equipmentForm.co2EquivalentTonnes" /></label
-          ><label
-            ><span class="mb-1.5 block text-xs font-bold">Kontrol periyodu</span
-            ><input
-              class="odv-input"
-              type="number"
-              step="3"
-              placeholder="3, 6, 12 veya 24"
-              [formField]="equipmentForm.inspectionIntervalMonths"
+              [formField]="equipmentForm.refrigerantChargeKg"
           /></label>
+          @if (compliance(); as auto) {
+            <div
+              class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/40"
+            >
+              <span class="block text-xs font-bold text-emerald-700 dark:text-emerald-300"
+                >CO₂ eşdeğeri · otomatik</span
+              >
+              <strong class="mt-1 block text-lg">{{ auto.tonnes | number: '1.0-3' }} t CO₂e</strong>
+              <span class="text-xs text-slate-500"
+                >{{ draft().refrigerantChargeKg | number: '1.0-3' }} kg × GWP
+                {{ auto.gwp | number: '1.0-0' }}</span
+              >
+            </div>
+            <div
+              class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/40"
+            >
+              <span class="block text-xs font-bold text-emerald-700 dark:text-emerald-300"
+                >Kontrol periyodu · otomatik</span
+              >
+              <strong class="mt-1 block text-lg">{{
+                auto.interval ? auto.interval + ' ayda bir' : 'Periyodik kontrol gerekmez'
+              }}</strong>
+              <span class="text-xs text-slate-500">AB 2024/573 Madde 5 eşiklerine göre</span>
+            </div>
+          } @else {
+            <label
+              ><span class="mb-1.5 block text-xs font-bold">CO₂ eşdeğeri (ton)</span
+              ><input
+                class="odv-input"
+                type="number"
+                step="0.001"
+                [formField]="equipmentForm.co2EquivalentTonnes" /></label
+            ><label
+              ><span class="mb-1.5 block text-xs font-bold">Kontrol periyodu (ay)</span
+              ><input
+                class="odv-input"
+                type="number"
+                step="3"
+                placeholder="3, 6, 12 veya 24"
+                [formField]="equipmentForm.inspectionIntervalMonths"
+            /></label>
+            <p class="m-0 text-xs text-slate-500 sm:col-span-2">
+              Gaz türü ve yükü girildiğinde CO₂ eşdeğeri ve kontrol periyodu otomatik hesaplanır.
+              Tablomuzda olmayan gazlar için değerleri elle girin.
+            </p>
+          }
           <label
             class="flex items-center gap-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700"
             ><input type="checkbox" [formField]="equipmentForm.hermeticallySealed" /><span
@@ -416,10 +454,12 @@ const EMPTY_DRAFT: EquipmentDraft = {
               [formField]="equipmentForm.lastLeakCheckAt" /></label
           ><label
             ><span class="mb-1.5 block text-xs font-bold">Sonraki kontrol tarihi</span
-            ><input
-              class="odv-input"
-              type="date"
-              [formField]="equipmentForm.nextLeakCheckDueAt" /></label
+            ><input class="odv-input" type="date" [formField]="equipmentForm.nextLeakCheckDueAt" />
+            @if (suggestedNextDue()) {
+              <span class="mt-1 block text-xs text-slate-500"
+                >Son kontrol + periyoda göre önerilen: {{ formatDate(suggestedNextDue()) }}</span
+              >
+            }</label
           ><label
             ><span class="mb-1.5 block text-xs font-bold">Sorumlu kişi</span
             ><input class="odv-input" [formField]="equipmentForm.responsiblePerson" /></label
@@ -477,6 +517,28 @@ export class EquipmentPage {
   readonly drawerOpen = signal(false);
   readonly selected = signal<FgasEquipment | null>(null);
   readonly draft = signal<EquipmentDraft>({ ...EMPTY_DRAFT });
+  /** CO2e and leak-check interval derived from gas and charge; null for gases not in the table. */
+  readonly compliance = computed(() => {
+    const draft = this.draft();
+    const gwp = refrigerantGwp(draft.refrigerant);
+    if (gwp === null || !(draft.refrigerantChargeKg > 0)) return null;
+    const tonnes = co2EquivalentTonnes(draft.refrigerantChargeKg, gwp);
+    const interval = leakCheckIntervalMonths({
+      co2EquivalentTonnes: tonnes,
+      hermeticallySealed: draft.hermeticallySealed,
+      leakDetectionSystem: draft.leakDetectionSystem,
+      equipmentType: draft.equipmentType,
+    });
+    return { gwp, tonnes, interval };
+  });
+  readonly suggestedNextDue = computed(() => {
+    const last = this.draft().lastLeakCheckAt;
+    const auto = this.compliance();
+    const interval = auto ? auto.interval : this.draft().inspectionIntervalMonths;
+    return last && interval ? addMonths(last, interval) : '';
+  });
+  /** Suggestion seen when the drawer opened, so a stored follow-up date is not overwritten. */
+  private lastSuggestion = '';
   readonly equipmentForm = form(this.draft, (p) => {
     required(p.name);
     minLength(p.name, 3);
@@ -486,7 +548,7 @@ export class EquipmentPage {
     min(p.refrigerantChargeKg, 0);
     min(p.co2EquivalentTonnes, 0);
     validate(p.inspectionIntervalMonths, ({ value }) =>
-      ([3, 6, 12, 24] as number[]).includes(value())
+      this.compliance() || ([3, 6, 12, 24] as number[]).includes(value())
         ? undefined
         : { kind: 'interval', message: 'Kontrol periyodu 3, 6, 12 veya 24 ay olmalıdır.' },
     );
@@ -494,6 +556,20 @@ export class EquipmentPage {
 
   constructor() {
     void this.reload();
+    // Fill the next due date when the last check, gas or interval changes.
+    effect(() => {
+      const suggestion = this.suggestedNextDue();
+      if (!this.drawerOpen() || suggestion === this.lastSuggestion) return;
+      this.lastSuggestion = suggestion;
+      if (suggestion) this.draft.update((draft) => ({ ...draft, nextLeakCheckDueAt: suggestion }));
+    });
+  }
+  private payload(): EquipmentPayload {
+    const draft = this.draft();
+    const auto = this.compliance();
+    return auto
+      ? { ...draft, co2EquivalentTonnes: auto.tonnes, inspectionIntervalMonths: auto.interval }
+      : draft;
   }
   async reload(): Promise<void> {
     this.loading.set(true);
@@ -519,6 +595,7 @@ export class EquipmentPage {
     this.selected.set(null);
     this.audit.set([]);
     this.draft.set({ ...EMPTY_DRAFT });
+    this.lastSuggestion = this.suggestedNextDue();
     this.equipmentForm().reset();
     this.drawerOpen.set(true);
   }
@@ -546,6 +623,7 @@ export class EquipmentPage {
       notes: row.notes ?? '',
       status: row.status,
     });
+    this.lastSuggestion = this.suggestedNextDue();
     this.equipmentForm().reset(this.draft());
     this.drawerOpen.set(true);
     try {
@@ -565,8 +643,8 @@ export class EquipmentPage {
       this.saveError.set('');
       try {
         const current = this.selected();
-        if (current) await this.api.update(current.id, current.version, this.draft());
-        else await this.api.create(this.draft());
+        if (current) await this.api.update(current.id, current.version, this.payload());
+        else await this.api.create(this.payload());
         this.closeDrawer();
         await this.reload();
         await Swal.fire({

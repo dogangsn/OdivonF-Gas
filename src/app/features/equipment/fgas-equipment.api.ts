@@ -65,6 +65,11 @@ export interface EquipmentDraft {
   status: EquipmentStatus;
 }
 
+/** What is sent to MainAPI; the interval is null when no periodic check is required. */
+export type EquipmentPayload = Omit<EquipmentDraft, 'inspectionIntervalMonths'> & {
+  inspectionIntervalMonths: InspectionInterval | null;
+};
+
 export interface FgasDashboard {
   readonly totalEquipment: number;
   readonly activeEquipment: number;
@@ -134,13 +139,13 @@ export class FgasEquipmentApi {
     );
   }
 
-  create(draft: EquipmentDraft): Promise<FgasEquipment> {
+  create(draft: EquipmentPayload): Promise<FgasEquipment> {
     return this.request(
       this.http.post<ApiEnvelope<FgasEquipment>>(`${this.endpoint}/records`, this.payload(draft)),
     );
   }
 
-  update(id: string, version: number, draft: EquipmentDraft): Promise<FgasEquipment> {
+  update(id: string, version: number, draft: EquipmentPayload): Promise<FgasEquipment> {
     return this.request(
       this.http.patch<ApiEnvelope<FgasEquipment>>(
         `${this.endpoint}/records/${encodeURIComponent(id)}`,
@@ -169,7 +174,7 @@ export class FgasEquipmentApi {
     );
   }
 
-  private payload(draft: EquipmentDraft): Record<string, unknown> {
+  private payload(draft: EquipmentPayload): Record<string, unknown> {
     const optional = (value: string) => value.trim() || undefined;
     return {
       ...draft,
@@ -185,6 +190,7 @@ export class FgasEquipmentApi {
       nextLeakCheckDueAt: optional(draft.nextLeakCheckDueAt),
       responsiblePerson: optional(draft.responsiblePerson),
       notes: optional(draft.notes),
+      inspectionIntervalMonths: draft.inspectionIntervalMonths ?? undefined,
     };
   }
 

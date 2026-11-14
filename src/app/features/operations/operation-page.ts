@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormField, form, minLength, required, submit } from '@angular/forms/signals';
 import { ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -12,6 +12,7 @@ import {
   OperationKind,
   OperationStatus,
 } from './fgas-operations.api';
+import { FgasEquipment, FgasEquipmentApi } from '../equipment/fgas-equipment.api';
 
 const EMPTY: OperationDraft = {
   title: '',
@@ -199,7 +200,7 @@ const CONFIG: Record<
                     <td class="odv-td">
                       <span class="font-mono text-xs">{{ row.reference || '—' }}</span
                       ><span class="block text-xs text-slate-500">{{
-                        row.equipmentId || 'Ekipman bağlantısı yok'
+                        equipmentLabel(row.equipmentId)
                       }}</span>
                     </td>
                     <td class="odv-td">
@@ -311,9 +312,22 @@ const CONFIG: Record<
             ><span class="mb-1.5 block text-xs font-bold">Referans no</span
             ><input class="odv-input" [formField]="operationForm.reference" /></label
           ><label
-            ><span class="mb-1.5 block text-xs font-bold">Ekipman kimliği</span
-            ><input class="odv-input" [formField]="operationForm.equipmentId"
-          /></label>
+            ><span class="mb-1.5 block text-xs font-bold">Ekipman</span
+            ><select class="odv-input" [formField]="operationForm.equipmentId">
+              <option value="">Ekipman seçin</option>
+              @for (item of equipment(); track item.id) {
+                <option [value]="item.id">
+                  {{ item.name }}{{ item.equipmentCode ? ' · ' + item.equipmentCode : '' }} ·
+                  {{ item.location }}
+                </option>
+              }
+              @if (model().equipmentId && !equipmentById().has(model().equipmentId)) {
+                <option [value]="model().equipmentId">
+                  Listede olmayan ekipman ({{ model().equipmentId }})
+                </option>
+              }
+            </select></label
+          >
           <label class="sm:col-span-2"
             ><span class="mb-1.5 block text-xs font-bold">Tesis / lokasyon</span
             ><input class="odv-input" [formField]="operationForm.location"
@@ -488,8 +502,40 @@ export class OperationPage {
     minLength(p.title, 2);
   });
   private readonly api = inject(FgasOperationsApi);
+  private readonly equipmentApi = inject(FgasEquipmentApi);
+  readonly equipment = signal<FgasEquipment[]>([]);
+  readonly equipmentById = computed(
+    () => new Map(this.equipment().map((item) => [item.id, item] as const)),
+  );
+  private lastEquipmentId = '';
   constructor() {
     void this.load();
+    void this.loadEquipment();
+    // Picking equipment fills location and gas when they are still empty.
+    effect(() => {
+      const id = this.model().equipmentId;
+      if (id === this.lastEquipmentId) return;
+      this.lastEquipmentId = id;
+      const item = untracked(() => this.equipmentById().get(id));
+      if (!item) return;
+      this.model.update((draft) => ({
+        ...draft,
+        location: draft.location || item.location,
+        refrigerant: draft.refrigerant || item.refrigerant || '',
+      }));
+    });
+  }
+  async loadEquipment(): Promise<void> {
+    try {
+      this.equipment.set((await this.equipmentApi.list()).items);
+    } catch {
+      this.equipment.set([]);
+    }
+  }
+  equipmentLabel(id: string | null): string {
+    if (!id) return 'Ekipman bağlantısı yok';
+    const item = this.equipmentById().get(id);
+    return item ? `${item.name} · ${item.location}` : id;
   }
   async load(): Promise<void> {
     this.loading.set(true);
@@ -517,6 +563,7 @@ export class OperationPage {
   openCreate() {
     this.selected.set(null);
     this.model.set({ ...EMPTY });
+    this.lastEquipmentId = '';
     this.operationForm().reset();
     this.drawerOpen.set(true);
   }
@@ -544,6 +591,7 @@ export class OperationPage {
       notes: row.notes ?? '',
       evidenceRefs: row.evidenceRefs.join(', '),
     });
+    this.lastEquipmentId = row.equipmentId ?? '';
     this.operationForm().reset();
     this.drawerOpen.set(true);
   }
