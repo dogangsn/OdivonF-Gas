@@ -12,6 +12,18 @@
   --color-primary-700: #4338ca;
   --color-accent-500: #8b5cf6;
   --color-accent-600: #7c3aed;
+  /* Public site and sign-in: petrol blue "audit ledger" palette. */
+  --color-brand-50: #eef8f8;
+  --color-brand-100: #d3eeef;
+  --color-brand-200: #a9dde0;
+  --color-brand-300: #71c2c8;
+  --color-brand-400: #3aa1aa;
+  --color-brand-500: #1f8590;
+  --color-brand-600: #176b76;
+  --color-brand-700: #145862;
+  --color-brand-800: #134850;
+  --color-brand-900: #123c43;
+  --color-brand-950: #08252a;
   --color-success-50: #ecfdf5;
   --color-success-600: #059669;
   --color-warning-50: #fffbeb;
@@ -214,6 +226,34 @@
     outline-offset: 2px;
   }
 }
+@utility odv-btn-brand {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.625rem;
+  background: var(--color-brand-700);
+  padding: 0.625rem 1.125rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: white;
+  transition:
+    background-color 0.15s,
+    opacity 0.15s;
+  &:hover {
+    background: var(--color-brand-800);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--color-brand-400);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
 @utility odv-btn-secondary {
   display: inline-flex;
   min-height: 2.75rem;

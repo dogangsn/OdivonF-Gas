@@ -15,7 +15,7 @@ export const HOME_FAQ = [
   },
   {
     q: 'Servis firmaları müşterileri adına kullanabilir mi?',
-    a: 'Evet. Ekipmanları lokasyon ve müşteri bazında gruplayabilir, her servis kaydını teknisyen ve kanıtla birlikte saklayabilir, müşteriye denetim paketi verebilirsiniz.',
+    a: 'Evet. Ekipmanları müşteri ve lokasyon adıyla kaydedebilir, her servis kaydını teknisyen bilgisiyle saklayabilir, denetim paketini dışa aktarabilirsiniz.',
   },
   {
     q: 'Verilerim nerede ve nasıl saklanıyor?',
@@ -30,7 +30,7 @@ export const HOME_FAQ = [
 export const SERVICE_FAQ = [
   {
     q: 'Birden fazla müşterinin ekipmanını ayrı tutabilir miyim?',
-    a: 'Evet. Ekipmanlar lokasyon ve müşteri bilgisiyle kaydedilir; listeleri, kontrolleri ve raporları müşteri bazında filtreleyebilirsiniz.',
+    a: 'Evet. Her ekipman lokasyon bilgisiyle kaydedilir; müşteriyi lokasyon adında belirterek listeleri ve kontrolleri müşteriye göre arayabilirsiniz.',
   },
   {
     q: 'Teknisyenlerim sahadan kayıt girebilir mi?',

@@ -6,7 +6,7 @@ import { MarketingCta } from './marketing-cta';
   imports: [MarketingCta],
   template: `
     <section class="mx-auto max-w-7xl px-4 pb-6 pt-14 sm:px-6">
-      <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Özellikler</span>
+      <span class="text-xs font-bold uppercase tracking-wider text-brand-600">Özellikler</span>
       <h1
         class="mt-2 max-w-3xl text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white"
       >
@@ -22,7 +22,7 @@ import { MarketingCta } from './marketing-cta';
       <section class="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2">
         <div [class.lg:order-2]="odd">
           <span
-            class="grid size-12 place-items-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300"
+            class="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-950/60 dark:text-brand-300"
             ><span class="material-symbols-rounded" aria-hidden="true">{{ block.icon }}</span></span
           >
           <h2 class="mt-4 text-3xl font-black tracking-tight text-slate-900 dark:text-white">
@@ -50,7 +50,7 @@ import { MarketingCta } from './marketing-cta';
             [height]="block.image.height"
             [alt]="block.image.alt"
             loading="lazy"
-            class="h-auto w-full rounded-3xl border border-slate-200/80 shadow-xl shadow-indigo-500/10 dark:border-slate-800"
+            class="h-auto w-full rounded-3xl border border-slate-200/80 shadow-xl shadow-brand-500/10 dark:border-slate-800"
           />
         } @else {
           <div class="odv-card grid gap-3 p-6 sm:grid-cols-2">
@@ -126,16 +126,16 @@ export class FeaturesPage {
     {
       icon: 'verified_user',
       title: 'Teknisyen, denetim ve değişmez kayıt',
-      body: 'Teknisyen sertifikalarını geçerlilik tarihiyle saklayın. Müşteri ve ekipman bazlı denetim paketini tek tıkla alın. Her değişiklik denetim izine yazılır.',
+      body: 'Teknisyen sertifikalarını geçerlilik tarihiyle saklayın. Denetim paketini tek tıkla dışa aktarın. Her değişiklik denetim izine yazılır.',
       points: [
         'Sertifika süresi dolmadan uyarı',
         'Rol bazlı yetki: görüntüleyici, teknisyen, yönetici',
-        '8 dilde arayüz: TR, EN, DE, FR, ES, IT, NL, AR',
+        'Türkçe arayüz ve Türkçe destek',
       ],
       image: null,
       stats: [
         { label: 'Roller', value: '3' },
-        { label: 'Dil', value: '8' },
+        { label: 'Kullanıcı', value: 'Ekip' },
         { label: 'Denetim izi', value: '%100' },
         { label: 'Kurulum', value: 'Yok' },
       ],

@@ -11,11 +11,11 @@ import { AuthStore } from '../../core/auth/auth-store';
       <section class="odv-card w-full max-w-md p-7 sm:p-9" aria-labelledby="reset-title">
         <a
           routerLink="/login"
-          class="mb-7 inline-flex items-center gap-2 text-sm font-bold text-indigo-600"
+          class="mb-7 inline-flex items-center gap-2 text-sm font-bold text-brand-600"
           ><span class="material-symbols-rounded directional-icon">arrow_back</span>Girişe dön</a
         >
         <span
-          class="grid size-12 place-items-center rounded-2xl bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"
+          class="grid size-12 place-items-center rounded-2xl bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
           ><span class="material-symbols-rounded">lock_reset</span></span
         >
         <h1 id="reset-title" class="mb-2 mt-5 text-2xl font-black">Şifrenizi sıfırlayın</h1>
@@ -47,7 +47,7 @@ import { AuthStore } from '../../core/auth/auth-store';
                 {{ error() }}
               </div>
             }
-            <button class="odv-btn-primary w-full" type="submit" [disabled]="busy()">
+            <button class="odv-btn-brand w-full" type="submit" [disabled]="busy()">
               {{ busy() ? 'Gönderiliyor…' : 'Sıfırlama bağlantısı gönder' }}
             </button>
           </form>

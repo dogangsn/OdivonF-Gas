@@ -8,7 +8,7 @@ import { SERVICE_FAQ } from './marketing-faq-content';
   imports: [MarketingCta, MarketingFaq],
   template: `
     <section class="mx-auto max-w-7xl px-4 pb-10 pt-14 sm:px-6">
-      <span class="text-xs font-bold uppercase tracking-wider text-indigo-600"
+      <span class="text-xs font-bold uppercase tracking-wider text-brand-600"
         >Klima ve soğutma servis firmaları</span
       >
       <h1
@@ -18,8 +18,8 @@ import { SERVICE_FAQ } from './marketing-faq-content';
       </h1>
       <p class="mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
         Müşterilerinizin ekipman kayıtlarını, periyodik sızıntı kontrollerini ve gaz hareketlerini
-        tek panelden yönetin. Denetim paketini müşterinize tek tıkla verin, servisinizi sözleşmeye
-        bağlayın.
+        tek panelden yönetin. Denetim öncesi kayıtları tek pakette dışa aktarın, servisinizi
+        sözleşmeye bağlayın.
       </p>
     </section>
 
@@ -44,7 +44,7 @@ import { SERVICE_FAQ } from './marketing-faq-content';
         @for (step of steps; track step.title; let i = $index) {
           <li class="odv-card p-6">
             <span
-              class="grid size-9 place-items-center rounded-full bg-indigo-600 text-sm font-black text-white"
+              class="grid size-9 place-items-center rounded-full bg-brand-600 text-sm font-black text-white"
               >{{ i + 1 }}</span
             >
             <h3 class="mt-4 text-base font-black text-slate-900 dark:text-white">
@@ -71,7 +71,7 @@ export class ServiceCompaniesPage {
     {
       icon: 'groups',
       title: 'Müşteri bazında düzen',
-      body: 'Her müşterinin lokasyonları, ekipmanları ve servis geçmişi ayrı. Kim, neyi, ne zaman yaptı belli.',
+      body: 'Müşteri ve lokasyon adıyla kaydedilen ekipmanlar, servis geçmişiyle birlikte. Kim, neyi, ne zaman yaptı belli.',
     },
     {
       icon: 'notifications_active',
@@ -99,7 +99,7 @@ export class ServiceCompaniesPage {
     },
     {
       title: 'Raporu verin',
-      body: 'Müşteri bazlı denetim paketini dışa aktarın ve paylaşın.',
+      body: 'Denetim paketini dışa aktarın ve müşterinizle paylaşın.',
     },
   ] as const;
 }

@@ -69,7 +69,7 @@ export const MARKETING_ROUTES: Routes = [
           seo: {
             title: 'Klima ve Soğutma Servis Firmaları için F-Gas Takibi',
             description:
-              'Müşteri bazında ekipman ve servis kayıtları, sahadan kontrol sonucu, müşteriye tek tıkla denetim paketi.',
+              'Müşteri ve lokasyon bazında ekipman ve servis kayıtları, kontrol takvimi ve dışa aktarılabilir denetim paketi.',
             path: '/servis-firmalari',
             jsonLd: [crumb('Servis firmaları', '/servis-firmalari'), faqLd(SERVICE_FAQ)],
           } satisfies SeoPage,
