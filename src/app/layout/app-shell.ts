@@ -40,9 +40,7 @@ interface MenuGroup {
       >
         <div class="flex h-16 items-center justify-between px-5">
           <a routerLink="/overview" class="flex items-center gap-3" (click)="mobileOpen.set(false)">
-            <span
-              class="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25"
-            >
+            <span class="grid size-9 place-items-center rounded-lg bg-brand-700 text-white">
               <span class="material-symbols-rounded !text-[20px]" aria-hidden="true">ac_unit</span>
             </span>
             <span class="leading-tight">
@@ -78,17 +76,17 @@ interface MenuGroup {
                       routerLinkActive
                       #rla="routerLinkActive"
                       [attr.aria-current]="rla.isActive ? 'page' : null"
-                      class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 aria-[current=page]:bg-indigo-50 aria-[current=page]:text-indigo-700 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-white dark:aria-[current=page]:bg-indigo-500/10 dark:aria-[current=page]:text-indigo-300"
+                      class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 aria-[current=page]:bg-brand-50 aria-[current=page]:text-brand-700 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-white dark:aria-[current=page]:bg-brand-500/10 dark:aria-[current=page]:text-brand-300"
                       (click)="mobileOpen.set(false)"
                     >
                       @if (rla.isActive) {
                         <span
-                          class="absolute inset-y-2 start-0 w-1 rounded-e-full bg-indigo-500"
+                          class="absolute inset-y-2 start-0 w-1 rounded-e-full bg-brand-500"
                           aria-hidden="true"
                         ></span>
                       }
                       <span
-                        class="material-symbols-rounded !text-[20px] text-slate-400 group-hover:text-slate-600 group-aria-[current=page]:text-indigo-600 dark:group-hover:text-slate-200 dark:group-aria-[current=page]:text-indigo-300"
+                        class="material-symbols-rounded !text-[20px] text-slate-400 group-hover:text-slate-600 group-aria-[current=page]:text-brand-600 dark:group-hover:text-slate-200 dark:group-aria-[current=page]:text-brand-300"
                         aria-hidden="true"
                         >{{ item.icon }}</span
                       >
@@ -105,10 +103,10 @@ interface MenuGroup {
           @if (planNote(); as note) {
             <a
               [routerLink]="canManageBilling() ? '/billing' : null"
-              class="block rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-violet-50 p-3 dark:border-indigo-500/20 dark:from-indigo-500/10 dark:to-violet-500/10"
+              class="block rounded-xl border border-brand-100 bg-brand-50 p-3 dark:border-brand-500/20 dark:bg-brand-500/10"
             >
               <span
-                class="flex items-center gap-2 text-xs font-extrabold text-indigo-700 dark:text-indigo-300"
+                class="flex items-center gap-2 text-xs font-extrabold text-brand-700 dark:text-brand-300"
               >
                 <span class="material-symbols-rounded !text-base" aria-hidden="true"
                   >workspace_premium</span
@@ -121,7 +119,7 @@ interface MenuGroup {
           }
           <div class="flex items-center gap-3 rounded-xl p-2">
             <span
-              class="grid size-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 text-xs font-black text-indigo-700 dark:from-indigo-500/20 dark:to-violet-500/20 dark:text-indigo-200"
+              class="grid size-9 shrink-0 place-items-center rounded-full bg-brand-100 text-xs font-black text-brand-700 dark:bg-brand-500/20 dark:text-brand-200"
               aria-hidden="true"
               >{{ initials() }}</span
             >

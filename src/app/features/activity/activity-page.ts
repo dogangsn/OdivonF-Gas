@@ -26,7 +26,7 @@ interface Audit {
     <section class="odv-card overflow-hidden">
       @if (loading()) {
         <div class="grid min-h-64 place-items-center">
-          <span class="material-symbols-rounded animate-spin text-4xl text-indigo-600"
+          <span class="material-symbols-rounded animate-spin text-4xl text-brand-600"
             >progress_activity</span
           >
         </div>
@@ -101,7 +101,7 @@ export class ActivityPage {
     return e.endsWith('.created')
       ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300'
       : e.endsWith('.updated')
-        ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300'
+        ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300'
         : e.endsWith('.archived')
           ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300'
           : 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-300';

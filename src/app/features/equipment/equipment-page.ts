@@ -75,7 +75,7 @@ const EMPTY_DRAFT: EquipmentDraft = {
             <div class="flex items-center justify-between">
               <span class="odv-kpi-label">Toplam ekipman</span>
               <span
-                class="odv-kpi-icon bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
+                class="odv-kpi-icon bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300"
                 ><span class="material-symbols-rounded" aria-hidden="true"
                   >precision_manufacturing</span
                 ></span
@@ -169,7 +169,7 @@ const EMPTY_DRAFT: EquipmentDraft = {
         @if (loading()) {
           <div class="grid min-h-64 place-items-center" role="status">
             <div class="text-center">
-              <span class="material-symbols-rounded animate-spin text-4xl text-indigo-600"
+              <span class="material-symbols-rounded animate-spin text-4xl text-brand-600"
                 >progress_activity</span
               >
               <p class="text-sm font-semibold text-slate-500">Ekipmanlar MainAPI’den yükleniyor…</p>
@@ -258,7 +258,7 @@ const EMPTY_DRAFT: EquipmentDraft = {
                   <tr>
                     <td colspan="7" class="p-14 text-center">
                       <span
-                        class="mx-auto grid size-14 place-items-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-300"
+                        class="mx-auto grid size-14 place-items-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-500/10 dark:text-brand-300"
                         ><span class="material-symbols-rounded !text-3xl" aria-hidden="true"
                           >inventory_2</span
                         ></span
@@ -481,7 +481,7 @@ const EMPTY_DRAFT: EquipmentDraft = {
           <h3 class="m-0 text-base font-black">Değişmez denetim izi</h3>
           <ol class="mt-4 space-y-3">
             @for (entry of audit(); track entry.id) {
-              <li class="flex items-start justify-between gap-4 border-s border-indigo-300 ps-4">
+              <li class="flex items-start justify-between gap-4 border-s border-brand-300 ps-4">
                 <div>
                   <strong class="block text-sm">{{ auditLabel(entry) }}</strong
                   ><span class="text-xs text-slate-500"

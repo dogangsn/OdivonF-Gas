@@ -3,7 +3,15 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthStore } from '../../core/auth/auth-store';
 import { PageHeader } from '../../shared/ui/page-header';
-import { FgasDashboard, FgasEquipmentApi } from '../equipment/fgas-equipment.api';
+import { FgasDashboard, FgasEquipment, FgasEquipmentApi } from '../equipment/fgas-equipment.api';
+
+type Bucket = 'overdue' | 'week' | 'month' | 'later';
+
+interface ScheduleRow {
+  readonly equipment: FgasEquipment;
+  readonly days: number;
+  readonly bucket: Bucket;
+}
 
 interface ReadinessItem {
   readonly label: string;
@@ -12,45 +20,43 @@ interface ReadinessItem {
   readonly link: string;
 }
 
+const DAY = 24 * 60 * 60 * 1000;
+
 @Component({
   selector: 'app-overview-page',
   imports: [PageHeader, DecimalPipe, RouterLink],
   template: `
     <app-page-header
-      icon="space_dashboard"
+      icon="event_upcoming"
       [eyebrow]="greeting()"
-      title="F-Gas Genel Bakış"
-      description="Yasal kontrol takvimi, gaz yükü, saha aksiyonları ve denetime hazırlık durumu tek ekranda."
+      title="Kontrol takvimi"
+      description="Geciken ve yaklaşan sızıntı kontrolleri, gaz yükü ve denetime hazırlık durumu."
     >
-      <a actions class="odv-btn-secondary" routerLink="/inspections">
-        <span class="material-symbols-rounded" aria-hidden="true">verified</span>Denetimler
-      </a>
-      <a actions class="odv-btn-primary" routerLink="/equipment">
+      <a actions class="odv-btn-secondary" routerLink="/equipment">
         <span class="material-symbols-rounded" aria-hidden="true">add</span>Ekipman ekle
+      </a>
+      <a actions class="odv-btn-primary" routerLink="/leak-checks">
+        <span class="material-symbols-rounded" aria-hidden="true">fact_check</span>Kontrol kaydet
       </a>
     </app-page-header>
 
     @if (loading()) {
-      <div class="space-y-5" role="status" aria-label="Gösterge yükleniyor">
-        <div class="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-          <div class="h-56 animate-pulse rounded-2xl bg-slate-200/70 dark:bg-slate-800"></div>
-          <div class="h-56 animate-pulse rounded-2xl bg-slate-200/70 dark:bg-slate-800"></div>
-        </div>
-        <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          @for (i of [1, 2, 3, 4]; track i) {
-            <div class="h-36 animate-pulse rounded-2xl bg-slate-200/70 dark:bg-slate-800"></div>
-          }
+      <div class="space-y-5" role="status" aria-label="Takvim yükleniyor">
+        <div class="h-24 animate-pulse rounded-xl bg-slate-200/70 dark:bg-slate-800"></div>
+        <div class="grid gap-5 lg:grid-cols-[1fr_22rem]">
+          <div class="h-96 animate-pulse rounded-xl bg-slate-200/70 dark:bg-slate-800"></div>
+          <div class="h-96 animate-pulse rounded-xl bg-slate-200/70 dark:bg-slate-800"></div>
         </div>
       </div>
     } @else if (error()) {
       <div class="odv-card mx-auto max-w-lg p-10 text-center" role="alert">
         <span
-          class="mx-auto grid size-14 place-items-center rounded-2xl bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300"
+          class="mx-auto grid size-14 place-items-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300"
           ><span class="material-symbols-rounded !text-3xl" aria-hidden="true"
             >cloud_off</span
           ></span
         >
-        <h2 class="mb-1 mt-4 text-lg font-black">Canlı gösterge alınamadı</h2>
+        <h2 class="mb-1 mt-4 text-lg font-black">Takvim alınamadı</h2>
         <p class="text-sm text-slate-500 dark:text-slate-400">{{ error() }}</p>
         <button class="odv-btn-primary mt-4" type="button" (click)="load()">
           <span class="material-symbols-rounded" aria-hidden="true">refresh</span>Tekrar dene
@@ -58,339 +64,331 @@ interface ReadinessItem {
       </div>
     } @else if (dashboard(); as d) {
       <div class="space-y-5">
-        <section class="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-          <!-- Compliance radar -->
-          <article
-            class="relative flex flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 p-6 text-white shadow-xl shadow-indigo-950/20 sm:p-7"
-          >
-            <div
-              class="pointer-events-none absolute -end-24 -top-24 size-72 rounded-full bg-indigo-500/25 blur-3xl"
-              aria-hidden="true"
-            ></div>
-            <div class="relative flex flex-col gap-6 sm:flex-row sm:items-center">
-              <div class="relative mx-auto size-36 shrink-0 sm:mx-0" aria-hidden="true">
-                <svg viewBox="0 0 120 120" class="size-full -rotate-90">
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="52"
-                    fill="none"
-                    stroke="rgb(255 255 255 / .12)"
-                    stroke-width="10"
-                  />
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="52"
-                    fill="none"
-                    stroke-width="10"
-                    stroke-linecap="round"
-                    [attr.stroke]="scoreColor()"
-                    [attr.stroke-dasharray]="ringLength"
-                    [attr.stroke-dashoffset]="ringOffset()"
-                    class="transition-[stroke-dashoffset] duration-700"
-                  />
-                </svg>
-                <div class="absolute inset-0 grid place-items-center text-center">
-                  <div>
-                    <strong class="block text-4xl font-black leading-none tracking-tight">{{
-                      score() === null ? '—' : score() + '%'
-                    }}</strong>
-                    <span
-                      class="mt-1 block text-[10px] font-bold uppercase tracking-wider text-white/60"
-                      >zamanında</span
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="min-w-0">
-                <span
-                  class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold tracking-wide text-emerald-300"
-                  ><span class="size-2 animate-pulse rounded-full bg-emerald-400"></span>CANLI UYUM
-                  RADARI</span
-                >
-                <h2
-                  class="mb-0 mt-3 text-2xl font-black leading-tight tracking-tight sm:text-[26px]"
-                >
-                  {{ headline() }}
-                </h2>
-                <p class="mb-0 mt-2 text-sm leading-6 text-white/70">
-                  @if (d.totalEquipment) {
-                    {{ d.totalEquipment }} ekipmanın
-                    <strong class="text-white">{{ d.totalEquipment - d.overdueLeakChecks }}</strong>
-                    tanesi kontrol takvimine uygun. {{ d.leakChecks }} sızıntı kontrolü ve
-                    {{ d.certifiedTechnicians }} geçerli teknisyen kaydı izleniyor.
-                  } @else {
-                    Uyum oranını görmek için ilk ekipmanınızı ekleyin; kontrol takvimi buradan
-                    izlenecek.
-                  }
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <!-- Footprint -->
-          <article class="odv-card flex flex-col p-6">
-            <div class="flex items-center justify-between">
-              <h2 class="m-0 text-base font-black tracking-tight">Gaz ve emisyon yükü</h2>
-              <span class="odv-kpi-icon bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-300"
-                ><span class="material-symbols-rounded" aria-hidden="true">eco</span></span
-              >
-            </div>
-            <div class="mt-4 grid flex-1 grid-cols-2 gap-3">
-              <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
-                <span class="odv-kpi-label">CO₂ eşdeğeri</span>
-                <strong class="mt-2 block text-2xl font-black tracking-tight">{{
-                  d.co2EquivalentTonnes | number: '1.0-2'
-                }}</strong>
-                <span class="text-xs text-slate-500 dark:text-slate-400">ton CO₂e</span>
-              </div>
-              <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
-                <span class="odv-kpi-label">Toplam şarj</span>
-                <strong class="mt-2 block text-2xl font-black tracking-tight">{{
-                  d.refrigerantChargeKg | number: '1.0-2'
-                }}</strong>
-                <span class="text-xs text-slate-500 dark:text-slate-400">kg soğutucu akışkan</span>
-              </div>
-              <div
-                class="col-span-2 flex items-center justify-between rounded-xl bg-emerald-50 p-4 dark:bg-emerald-950/40"
-              >
-                <div>
-                  <span class="odv-kpi-label !text-emerald-700 dark:!text-emerald-300"
-                    >Geri kazanım</span
-                  >
-                  <strong
-                    class="mt-1 block text-xl font-black text-emerald-700 dark:text-emerald-300"
-                    >{{ d.gasRecoveredKg | number: '1.0-2' }} kg</strong
-                  >
-                </div>
-                <a routerLink="/gas-movements" class="odv-btn-ghost !min-h-9 !px-3 !text-xs"
-                  >Gaz defteri<span
-                    class="material-symbols-rounded !text-base directional-icon"
-                    aria-hidden="true"
-                    >arrow_forward</span
-                  ></a
-                >
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <!-- KPI cards -->
-        <section class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4" aria-label="Temel göstergeler">
-          @for (kpi of kpis(); track kpi.label) {
-            <a [routerLink]="kpi.link" class="odv-kpi group hover:-translate-y-0.5">
-              <div class="flex items-center justify-between">
-                <span class="odv-kpi-label">{{ kpi.label }}</span>
-                <span class="odv-kpi-icon" [class]="kpi.iconClass"
-                  ><span class="material-symbols-rounded" aria-hidden="true">{{
-                    kpi.icon
-                  }}</span></span
-                >
-              </div>
-              <strong class="odv-kpi-value" [class]="kpi.valueClass">{{ kpi.value }}</strong>
-              <span class="mt-1.5 block text-xs font-semibold text-slate-500 dark:text-slate-400">{{
-                kpi.note
-              }}</span>
-              <div
-                class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs font-bold text-slate-500 dark:border-slate-800 dark:text-slate-400"
-              >
-                <span>{{ kpi.footer }}</span>
-                <span
-                  class="material-symbols-rounded !text-base transition-transform group-hover:translate-x-0.5 directional-icon"
-                  aria-hidden="true"
-                  >arrow_forward</span
-                >
-              </div>
+        <!-- Summary strip -->
+        <section
+          class="odv-card grid grid-cols-2 divide-slate-200 lg:grid-cols-4 lg:divide-x dark:divide-slate-800"
+          aria-label="Özet"
+        >
+          @for (stat of stats(); track stat.label) {
+            <a
+              [routerLink]="stat.link"
+              class="block p-5 hover:bg-slate-50 dark:hover:bg-slate-800/40"
+            >
+              <span class="odv-kpi-label">{{ stat.label }}</span>
+              <strong class="mt-1.5 block text-2xl font-black tracking-tight" [class]="stat.tone">{{
+                stat.value
+              }}</strong>
+              <span class="text-xs text-slate-500 dark:text-slate-400">{{ stat.note }}</span>
             </a>
           }
         </section>
 
-        <section class="grid gap-5 lg:grid-cols-2">
-          <article class="odv-card p-6">
-            <h2 class="m-0 text-base font-black tracking-tight">Hızlı işlemler</h2>
-            <p class="mb-0 mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Sahada en sık yapılan kayıtlara tek tıkla geçin.
-            </p>
-            <div class="mt-5 grid gap-3 sm:grid-cols-2">
-              @for (action of quickActions; track action.link) {
-                <a
-                  [routerLink]="action.link"
-                  class="group flex items-center gap-3 rounded-xl border border-slate-200/80 p-3.5 transition hover:border-indigo-200 hover:bg-indigo-50/50 dark:border-slate-800 dark:hover:border-indigo-500/30 dark:hover:bg-indigo-500/5"
-                >
-                  <span
-                    class="odv-kpi-icon shrink-0 bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300"
-                    ><span class="material-symbols-rounded" aria-hidden="true">{{
-                      action.icon
-                    }}</span></span
+        <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <!-- Work list -->
+          <section class="odv-card overflow-hidden" aria-labelledby="schedule-title">
+            <div
+              class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 dark:border-slate-800"
+            >
+              <h2 id="schedule-title" class="m-0 text-base font-black tracking-tight">
+                Yapılacak kontroller
+              </h2>
+              <div class="odv-segment" role="group" aria-label="Zaman aralığı">
+                @for (tab of tabs(); track tab.key) {
+                  <button
+                    type="button"
+                    class="odv-segment-item"
+                    [attr.aria-pressed]="filter() === tab.key"
+                    (click)="filter.set(tab.key)"
                   >
-                  <span class="min-w-0">
-                    <strong class="block text-sm">{{ action.label }}</strong>
-                    <span class="block truncate text-xs text-slate-500 dark:text-slate-400">{{
-                      action.hint
-                    }}</span>
-                  </span>
-                </a>
-              }
-            </div>
-          </article>
-
-          <article class="odv-card p-6">
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <h2 class="m-0 text-base font-black tracking-tight">Denetime hazırlık</h2>
-                <p class="mb-0 mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  {{ readyCount() }} / {{ readiness().length }} madde tamam
-                </p>
+                    {{ tab.label }} <span class="ms-1 opacity-70">{{ tab.count }}</span>
+                  </button>
+                }
               </div>
-              <span
-                [class]="
-                  readyCount() === readiness().length ? 'odv-badge-success' : 'odv-badge-warning'
-                "
-                >{{ readyCount() === readiness().length ? 'Hazır' : 'Eksikler var' }}</span
-              >
             </div>
-            <div class="mt-4 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-              <div
-                class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-[width] duration-700"
-                [style.width.%]="(readyCount() / readiness().length) * 100"
-              ></div>
-            </div>
-            <ul class="mt-4 space-y-1">
-              @for (item of readiness(); track item.label) {
-                <li>
-                  <a
-                    [routerLink]="item.link"
-                    class="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-slate-50 dark:hover:bg-slate-800/60"
-                  >
+
+            @if (!equipment().length) {
+              <div class="p-8">
+                <h3 class="m-0 text-base font-black">Takviminizi üç adımda kurun</h3>
+                <ol class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                  <li class="flex gap-3">
                     <span
-                      class="grid size-7 shrink-0 place-items-center rounded-full"
-                      [class]="
-                        item.ok
-                          ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300'
-                          : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300'
-                      "
-                      ><span class="material-symbols-rounded !text-[18px]" aria-hidden="true">{{
-                        item.ok ? 'check' : 'priority_high'
-                      }}</span></span
+                      class="grid size-6 shrink-0 place-items-center rounded-md bg-brand-700 text-xs font-black text-white"
+                      >1</span
                     >
-                    <span class="min-w-0 flex-1">
-                      <strong class="block text-sm">{{ item.label }}</strong>
-                      <span class="block text-xs text-slate-500 dark:text-slate-400">{{
-                        item.hint
+                    Ekipmanı gaz türü ve kilogramıyla ekleyin; CO₂e ve periyot otomatik hesaplanır.
+                  </li>
+                  <li class="flex gap-3">
+                    <span
+                      class="grid size-6 shrink-0 place-items-center rounded-md bg-brand-700 text-xs font-black text-white"
+                      >2</span
+                    >
+                    Son kontrol tarihini girin; bir sonraki kontrol buraya düşer.
+                  </li>
+                  <li class="flex gap-3">
+                    <span
+                      class="grid size-6 shrink-0 place-items-center rounded-md bg-brand-700 text-xs font-black text-white"
+                      >3</span
+                    >
+                    Kontrolü yapınca sonucu kaydedin; takvim kendiliğinden ilerler.
+                  </li>
+                </ol>
+                <a routerLink="/equipment" class="odv-btn-primary mt-6 inline-flex">
+                  <span class="material-symbols-rounded" aria-hidden="true">add</span>İlk ekipmanı
+                  ekle
+                </a>
+              </div>
+            } @else if (!visibleRows().length) {
+              <p class="m-0 px-5 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+                {{ emptyText() }}
+              </p>
+            } @else {
+              <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+                @for (row of visibleRows(); track row.equipment.id) {
+                  <li class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
+                    <span
+                      class="h-10 w-1 shrink-0 rounded-full"
+                      [class]="barClass(row.bucket)"
+                      aria-hidden="true"
+                    ></span>
+                    <div class="min-w-0 flex-1 basis-48">
+                      <strong class="block truncate text-sm">{{ row.equipment.name }}</strong>
+                      <span class="block truncate text-xs text-slate-500 dark:text-slate-400"
+                        >{{ row.equipment.location }}
+                        @if (row.equipment.responsiblePerson) {
+                          · {{ row.equipment.responsiblePerson }}
+                        }
+                      </span>
+                    </div>
+                    <div class="hidden w-40 text-xs sm:block">
+                      <span class="block font-semibold text-slate-700 dark:text-slate-200">{{
+                        row.equipment.refrigerant || '—'
                       }}</span>
-                    </span>
-                    <span class="sr-only">{{ item.ok ? 'Tamam' : 'Eksik' }}</span>
-                  </a>
-                </li>
-              }
-            </ul>
-          </article>
-        </section>
+                      <span class="text-slate-500 dark:text-slate-400"
+                        >{{ row.equipment.co2EquivalentTonnes ?? 0 | number: '1.0-1' }} t CO₂e
+                        @if (row.equipment.inspectionIntervalMonths) {
+                          · {{ row.equipment.inspectionIntervalMonths }} ay
+                        }
+                      </span>
+                    </div>
+                    <div class="w-32 text-xs">
+                      <span class="block font-bold text-slate-800 dark:text-slate-100">{{
+                        formatDate(row.equipment.nextLeakCheckDueAt!)
+                      }}</span>
+                      <span class="font-bold" [class]="dueClass(row.bucket)">{{
+                        relative(row.days)
+                      }}</span>
+                    </div>
+                    <a
+                      class="odv-btn-ghost !min-h-9 !px-3 !text-xs"
+                      routerLink="/leak-checks"
+                      [queryParams]="{ equipment: row.equipment.id }"
+                      [attr.aria-label]="row.equipment.name + ' için kontrol kaydet'"
+                      >Kontrol kaydet</a
+                    >
+                  </li>
+                }
+              </ul>
+            }
+            @if (unscheduled() && equipment().length) {
+              <a
+                routerLink="/equipment"
+                class="flex items-center gap-2 border-t border-slate-200 bg-amber-50/60 px-5 py-3 text-xs font-bold text-amber-800 dark:border-slate-800 dark:bg-amber-950/30 dark:text-amber-300"
+              >
+                <span class="material-symbols-rounded !text-base" aria-hidden="true">info</span>
+                {{ unscheduled() }} ekipmanın kontrol tarihi yok. Son kontrol tarihini girin.
+              </a>
+            }
+          </section>
+
+          <aside class="space-y-5">
+            <!-- Readiness -->
+            <section class="odv-card p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h2 class="m-0 text-base font-black tracking-tight">Denetime hazırlık</h2>
+                  <p class="mb-0 mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {{ readyCount() }} / {{ readiness().length }} madde tamam
+                  </p>
+                </div>
+                <span
+                  [class]="
+                    readyCount() === readiness().length ? 'odv-badge-success' : 'odv-badge-warning'
+                  "
+                  >{{ readyCount() === readiness().length ? 'Hazır' : 'Eksikler var' }}</span
+                >
+              </div>
+              <ul class="mt-3 space-y-0.5">
+                @for (item of readiness(); track item.label) {
+                  <li>
+                    <a
+                      [routerLink]="item.link"
+                      class="flex items-center gap-3 rounded-lg px-2 py-2 transition hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                    >
+                      <span
+                        class="material-symbols-rounded !text-[20px]"
+                        [class]="
+                          item.ok
+                            ? 'text-brand-600 dark:text-brand-300'
+                            : 'text-amber-600 dark:text-amber-400'
+                        "
+                        aria-hidden="true"
+                        >{{ item.ok ? 'check_circle' : 'error' }}</span
+                      >
+                      <span class="min-w-0 flex-1">
+                        <strong class="block text-sm">{{ item.label }}</strong>
+                        <span class="block text-xs text-slate-500 dark:text-slate-400">{{
+                          item.hint
+                        }}</span>
+                      </span>
+                      <span class="sr-only">{{ item.ok ? 'Tamam' : 'Eksik' }}</span>
+                    </a>
+                  </li>
+                }
+              </ul>
+            </section>
+
+            <!-- Gas load -->
+            <section class="odv-card p-5">
+              <h2 class="m-0 text-base font-black tracking-tight">Gaz yükü</h2>
+              <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <dt class="odv-kpi-label">Şarj</dt>
+                  <dd class="m-0 mt-1 font-black">
+                    {{ d.refrigerantChargeKg | number: '1.0-1' }} kg
+                  </dd>
+                </div>
+                <div>
+                  <dt class="odv-kpi-label">Geri kazanım</dt>
+                  <dd class="m-0 mt-1 font-black">{{ d.gasRecoveredKg | number: '1.0-1' }} kg</dd>
+                </div>
+              </dl>
+              <a
+                routerLink="/gas-movements"
+                class="mt-4 inline-flex items-center gap-1 text-xs font-bold text-brand-700 dark:text-brand-300"
+                >Gaz defteri<span
+                  class="material-symbols-rounded !text-base directional-icon"
+                  aria-hidden="true"
+                  >arrow_forward</span
+                ></a
+              >
+            </section>
+          </aside>
+        </div>
       </div>
     }
   `,
 })
 export class OverviewPage {
   readonly auth = inject(AuthStore);
+  private readonly api = inject(FgasEquipmentApi);
   readonly dashboard = signal<FgasDashboard | null>(null);
+  readonly equipment = signal<FgasEquipment[]>([]);
   readonly loading = signal(true);
   readonly error = signal('');
-  readonly ringLength = 2 * Math.PI * 52;
-  readonly quickActions = [
-    {
-      link: '/leak-checks',
-      icon: 'fact_check',
-      label: 'Kontrol planla',
-      hint: 'Periyodik sızıntı kontrolü',
-    },
-    {
-      link: '/gas-movements',
-      icon: 'swap_horiz',
-      label: 'Gaz hareketi gir',
-      hint: 'Dolum, geri kazanım, bertaraf',
-    },
-    { link: '/technicians', icon: 'badge', label: 'Sertifika ekle', hint: 'Teknisyen yetkinliği' },
-    {
-      link: '/inspections',
-      icon: 'description',
-      label: 'Denetim oluştur',
-      hint: 'Bulgu ve kanıt paketi',
-    },
-  ];
+  readonly filter = signal<Bucket | 'soon'>('soon');
+
   readonly greeting = computed(() => {
     const first = this.auth.session()?.name?.trim().split(/\s+/)[0];
     const hour = new Date().getHours();
     const part = hour < 12 ? 'Günaydın' : hour < 18 ? 'İyi günler' : 'İyi akşamlar';
     return first ? `${part}, ${first}` : 'Operasyon merkezi';
   });
-  readonly score = computed(() => {
-    const d = this.dashboard();
-    if (!d || !d.totalEquipment) return null;
-    return Math.round(((d.totalEquipment - d.overdueLeakChecks) / d.totalEquipment) * 100);
+
+  /** Active equipment with a next check date, earliest first. */
+  readonly schedule = computed<ScheduleRow[]>(() => {
+    const today = this.startOfDay(new Date());
+    return this.equipment()
+      .filter((item) => item.status !== 'out-of-service' && item.nextLeakCheckDueAt)
+      .map((item) => {
+        const days = Math.round((this.isoDay(item.nextLeakCheckDueAt!) - today) / DAY);
+        const bucket: Bucket =
+          days < 0 ? 'overdue' : days <= 7 ? 'week' : days <= 31 ? 'month' : 'later';
+        return { equipment: item, days, bucket };
+      })
+      .sort((a, b) => a.days - b.days);
   });
-  readonly ringOffset = computed(() => this.ringLength * (1 - (this.score() ?? 0) / 100));
-  readonly scoreColor = computed(() => {
-    const s = this.score();
-    return s === null ? '#64748b' : s >= 90 ? '#34d399' : s >= 70 ? '#fbbf24' : '#fb7185';
+  readonly unscheduled = computed(
+    () =>
+      this.equipment().filter(
+        (item) => item.status !== 'out-of-service' && !item.nextLeakCheckDueAt,
+      ).length,
+  );
+  private readonly counts = computed(() => {
+    const rows = this.schedule();
+    const count = (bucket: Bucket) => rows.filter((row) => row.bucket === bucket).length;
+    return { overdue: count('overdue'), week: count('week'), month: count('month') };
   });
-  readonly headline = computed(() => {
-    const d = this.dashboard();
-    if (!d) return '';
-    if (!d.totalEquipment) return 'Envanteriniz henüz boş';
-    const open = d.pendingActions + d.overdueLeakChecks;
-    return open ? `${open} kritik aksiyon takip bekliyor` : 'Kritik aksiyon bulunmuyor';
+  readonly tabs = computed(() => {
+    const c = this.counts();
+    return [
+      { key: 'soon' as const, label: '30 gün', count: c.overdue + c.week + c.month },
+      { key: 'overdue' as const, label: 'Gecikmiş', count: c.overdue },
+      { key: 'week' as const, label: 'Bu hafta', count: c.week },
+      {
+        key: 'later' as const,
+        label: 'Sonra',
+        count: this.schedule().length - c.overdue - c.week - c.month,
+      },
+    ];
   });
-  readonly kpis = computed(() => {
+  readonly visibleRows = computed(() => {
+    const filter = this.filter();
+    return this.schedule().filter((row) =>
+      filter === 'soon' ? row.bucket !== 'later' : row.bucket === filter,
+    );
+  });
+  readonly emptyText = computed(
+    () =>
+      ({
+        soon: 'Önümüzdeki 30 günde kontrol yok. Takvim güncel.',
+        overdue: 'Geciken kontrol yok.',
+        week: 'Bu hafta kontrol yok.',
+        month: 'Bu ay kontrol yok.',
+        later: 'İleri tarihli kontrol yok.',
+      })[this.filter()],
+  );
+  readonly stats = computed(() => {
     const d = this.dashboard();
     if (!d) return [];
+    const c = this.counts();
     return [
       {
-        label: 'Toplam ekipman',
-        value: d.totalEquipment,
-        note: `${d.activeEquipment} aktif varlık`,
-        footer: 'Envantere git',
-        icon: 'precision_manufacturing',
-        iconClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300',
-        valueClass: '',
-        link: '/equipment',
-      },
-      {
-        label: 'Geciken kontrol',
-        value: d.overdueLeakChecks,
-        note: d.overdueLeakChecks ? 'Yasal tarihi aşan ekipman' : 'Takvim güncel',
-        footer: 'Kontrolleri planla',
-        icon: 'event_busy',
-        iconClass: 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300',
-        valueClass: d.overdueLeakChecks ? '!text-rose-600 dark:!text-rose-400' : '',
+        label: 'Gecikmiş kontrol',
+        value: c.overdue,
+        note: c.overdue ? 'Yasal tarihi geçti' : 'Takvim güncel',
+        tone: c.overdue ? '!text-rose-600 dark:!text-rose-400' : '',
         link: '/leak-checks',
       },
       {
-        label: 'Geçerli teknisyen',
-        value: d.certifiedTechnicians,
-        note: 'Sertifikası geçerli kayıt',
-        footer: 'Teknisyenler',
-        icon: 'engineering',
-        iconClass: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300',
-        valueClass: '',
-        link: '/technicians',
+        label: '30 gün içinde',
+        value: c.week + c.month,
+        note: `${c.week} tanesi bu hafta`,
+        tone: c.week ? '!text-amber-600 dark:!text-amber-400' : '',
+        link: '/leak-checks',
       },
       {
-        label: 'Açık aksiyon',
-        value: d.pendingActions + d.actionRequired,
-        note: 'Bulgu ve takip bekleyen kayıt',
-        footer: 'Denetimlere git',
-        icon: 'warning',
-        iconClass: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300',
-        valueClass:
-          d.pendingActions + d.actionRequired ? '!text-amber-600 dark:!text-amber-400' : '',
-        link: '/inspections',
+        label: 'Ekipman',
+        value: d.totalEquipment,
+        note: `${d.activeEquipment} aktif`,
+        tone: '',
+        link: '/equipment',
+      },
+      {
+        label: 'CO₂ eşdeğeri',
+        value: new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 }).format(
+          d.co2EquivalentTonnes,
+        ),
+        note: 'ton CO₂e toplam',
+        tone: '',
+        link: '/equipment',
       },
     ];
   });
   readonly readiness = computed<ReadinessItem[]>(() => {
     const d = this.dashboard();
     if (!d) return [];
+    const overdue = this.counts().overdue;
+    const open = d.pendingActions + d.actionRequired;
     return [
       {
         label: 'Ekipman envanteri',
@@ -400,19 +398,14 @@ export class OverviewPage {
       },
       {
         label: 'Gecikmesiz kontrol takvimi',
-        hint: d.overdueLeakChecks
-          ? `${d.overdueLeakChecks} ekipmanın kontrolü gecikmiş`
-          : 'Tüm kontroller zamanında',
-        ok: d.totalEquipment > 0 && d.overdueLeakChecks === 0,
+        hint: overdue ? `${overdue} ekipmanın kontrolü gecikmiş` : 'Tüm kontroller zamanında',
+        ok: d.totalEquipment > 0 && overdue === 0,
         link: '/leak-checks',
       },
       {
         label: 'Kapanmış bulgular',
-        hint:
-          d.pendingActions + d.actionRequired
-            ? `${d.pendingActions + d.actionRequired} açık aksiyon var`
-            : 'Açık aksiyon yok',
-        ok: d.pendingActions + d.actionRequired === 0,
+        hint: open ? `${open} açık aksiyon var` : 'Açık aksiyon yok',
+        ok: open === 0,
         link: '/inspections',
       },
       {
@@ -426,7 +419,7 @@ export class OverviewPage {
     ];
   });
   readonly readyCount = computed(() => this.readiness().filter((x) => x.ok).length);
-  private readonly api = inject(FgasEquipmentApi);
+
   constructor() {
     void this.load();
   }
@@ -434,11 +427,51 @@ export class OverviewPage {
     this.loading.set(true);
     this.error.set('');
     try {
-      this.dashboard.set(await this.api.dashboard());
+      const [dashboard, list] = await Promise.all([this.api.dashboard(), this.api.list()]);
+      this.dashboard.set(dashboard);
+      this.equipment.set(list.items);
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : 'Veri alınamadı.');
     } finally {
       this.loading.set(false);
     }
+  }
+  relative(days: number): string {
+    if (days < 0) return `${-days} gün gecikti`;
+    if (days === 0) return 'Bugün';
+    if (days === 1) return 'Yarın';
+    return `${days} gün kaldı`;
+  }
+  dueClass(bucket: Bucket): string {
+    return {
+      overdue: 'text-rose-600 dark:text-rose-400',
+      week: 'text-amber-600 dark:text-amber-400',
+      month: 'text-slate-600 dark:text-slate-300',
+      later: 'text-slate-500 dark:text-slate-400',
+    }[bucket];
+  }
+  barClass(bucket: Bucket): string {
+    return {
+      overdue: 'bg-rose-500',
+      week: 'bg-amber-400',
+      month: 'bg-brand-400',
+      later: 'bg-slate-200 dark:bg-slate-700',
+    }[bucket];
+  }
+  formatDate(value: string): string {
+    return new Intl.DateTimeFormat('tr-TR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(this.isoDay(value));
+  }
+  /** Midnight UTC of a YYYY-MM-DD date, so the day never shifts with the time zone. */
+  private isoDay(value: string): number {
+    const [year, month, day] = value.slice(0, 10).split('-').map(Number);
+    return Date.UTC(year, month - 1, day);
+  }
+  private startOfDay(date: Date): number {
+    return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
   }
 }

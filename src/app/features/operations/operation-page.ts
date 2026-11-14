@@ -162,7 +162,7 @@ const CONFIG: Record<
         </div>
         @if (loading()) {
           <div class="grid min-h-64 place-items-center" role="status">
-            <span class="material-symbols-rounded animate-spin text-4xl text-indigo-600"
+            <span class="material-symbols-rounded animate-spin text-4xl text-brand-600"
               >progress_activity</span
             >
           </div>
@@ -247,7 +247,7 @@ const CONFIG: Record<
                   <tr>
                     <td colspan="6" class="p-14 text-center">
                       <span
-                        class="mx-auto grid size-14 place-items-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-300"
+                        class="mx-auto grid size-14 place-items-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-500/10 dark:text-brand-300"
                         ><span class="material-symbols-rounded !text-3xl" aria-hidden="true">{{
                           config.icon
                         }}</span></span
@@ -439,7 +439,8 @@ const CONFIG: Record<
   `,
 })
 export class OperationPage {
-  readonly kind = inject(ActivatedRoute).snapshot.data['kind'] as OperationKind;
+  private readonly route = inject(ActivatedRoute);
+  readonly kind = this.route.snapshot.data['kind'] as OperationKind;
   readonly config = CONFIG[this.kind];
   readonly rows = signal<FgasOperation[]>([]);
   readonly loading = signal(true);
@@ -462,7 +463,7 @@ export class OperationPage {
       value: this.rows().length,
       note: 'MainAPI ile senkronize',
       icon: this.config.icon,
-      iconClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300',
+      iconClass: 'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300',
       valueClass: '',
     },
     {
@@ -530,6 +531,19 @@ export class OperationPage {
       this.equipment.set((await this.equipmentApi.list()).items);
     } catch {
       this.equipment.set([]);
+    }
+    // "Kontrol kaydet" on the overview opens a new record for that equipment.
+    const equipmentId = this.route.snapshot.queryParamMap.get('equipment');
+    const item = equipmentId ? this.equipmentById().get(equipmentId) : undefined;
+    if (item && this.kind === 'leak-check') {
+      this.openCreate();
+      this.model.update((draft) => ({
+        ...draft,
+        title: `${item.name} periyodik sızıntı kontrolü`,
+        equipmentId: item.id,
+        occurredAt: new Date().toISOString().slice(0, 10),
+        status: 'completed',
+      }));
     }
   }
   equipmentLabel(id: string | null): string {
