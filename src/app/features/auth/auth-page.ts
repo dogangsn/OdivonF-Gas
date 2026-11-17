@@ -25,12 +25,13 @@ import { PRODUCT } from '../../domain/product-manifest';
           class="absolute -start-20 top-20 size-80 rounded-full bg-fuchsia-400/20 blur-3xl"
         ></div>
         <div class="relative flex items-center gap-3">
-          <span class="grid size-11 place-items-center rounded-2xl bg-white/15"
+          <span
+            class="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-950/40"
             ><span class="material-symbols-rounded">verified_user</span></span
           >
           <div>
             <strong class="text-xl">Odivon</strong
-            ><span class="block text-xs text-indigo-200">{{ product.name }}</span>
+            ><span class="block text-xs text-indigo-200">F-Gas Uyum</span>
           </div>
         </div>
         <div class="relative max-w-2xl">
@@ -38,25 +39,51 @@ import { PRODUCT } from '../../domain/product-manifest';
             class="mb-5 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold"
             >{{ 'auth.platform' | t }}</span
           >
-          <h1 class="m-0 text-5xl font-black leading-tight">
+          <h1 class="m-0 text-4xl font-black leading-tight xl:text-[2.75rem]">
             {{ 'auth.headline' | t }}
           </h1>
           <p class="mt-6 max-w-xl text-base leading-7 text-indigo-100">
             {{ product.promiseKey | t }}
           </p>
-          <div class="mt-10 grid grid-cols-3 gap-3">
-            <div class="rounded-2xl bg-white/10 p-4">
-              <strong class="block text-2xl">100%</strong
-              ><span class="text-xs text-indigo-200">{{ 'auth.auditTrail' | t }}</span>
+          <ul class="mt-8 space-y-3 text-sm text-indigo-50">
+            @for (key of benefits; track key) {
+              <li class="flex items-start gap-3">
+                <span
+                  class="grid size-6 shrink-0 place-items-center rounded-full bg-emerald-400/15 text-emerald-300"
+                  ><span class="material-symbols-rounded !text-[16px]" aria-hidden="true"
+                    >check</span
+                  ></span
+                >{{ key | t }}
+              </li>
+            }
+          </ul>
+          <!-- Sample of the check schedule the workspace keeps -->
+          <div
+            class="mt-10 max-w-xl overflow-hidden rounded-2xl border border-white/15 bg-white/10 backdrop-blur"
+            aria-hidden="true"
+          >
+            <div
+              class="flex items-center justify-between border-b border-white/10 px-5 py-3 text-xs font-bold"
+            >
+              <span>{{ 'auth.previewTitle' | t }}</span>
+              <span class="rounded-full bg-rose-400/20 px-2.5 py-0.5 text-rose-200"
+                >1 · {{ 'auth.previewOverdue' | t }}</span
+              >
             </div>
-            <div class="rounded-2xl bg-white/10 p-4">
-              <strong class="block text-2xl">{{ 'auth.singlePanel' | t }}</strong
-              ><span class="text-xs text-indigo-200">{{ 'auth.equipmentGas' | t }}</span>
-            </div>
-            <div class="rounded-2xl bg-white/10 p-4">
-              <strong class="block text-2xl">{{ 'auth.ready' | t }}</strong
-              ><span class="text-xs text-indigo-200">{{ 'auth.auditPackage' | t }}</span>
-            </div>
+            @for (row of preview; track row.name) {
+              <div
+                class="flex items-center justify-between gap-4 border-b border-white/5 px-5 py-3 text-sm last:border-0"
+              >
+                <span class="min-w-0">
+                  <strong class="block truncate">{{ row.name }}</strong
+                  ><span class="text-xs text-indigo-200">{{ row.gas }}</span>
+                </span>
+                <span class="shrink-0 text-end text-xs">
+                  <strong class="block">{{ row.date }}</strong
+                  ><span [class]="row.tone">{{ row.state | t }}</span>
+                </span>
+              </div>
+            }
           </div>
         </div>
         <p class="relative text-xs text-indigo-300">{{ 'auth.cloud' | t }}</p>
@@ -64,6 +91,13 @@ import { PRODUCT } from '../../domain/product-manifest';
       <section
         class="relative flex min-h-screen items-center justify-center bg-slate-50 p-5 text-slate-900 dark:bg-[#0b1120] dark:text-white"
       >
+        <a
+          routerLink="/"
+          class="absolute start-5 top-6 inline-flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-indigo-600 dark:text-slate-400"
+          ><span class="material-symbols-rounded directional-icon !text-base" aria-hidden="true"
+            >arrow_back</span
+          >{{ 'auth.backHome' | t }}</a
+        >
         <label class="absolute end-5 top-5">
           <span class="sr-only">{{ 'auth.language' | t }}</span>
           <select
@@ -80,7 +114,7 @@ import { PRODUCT } from '../../domain/product-manifest';
           <div class="mb-8 flex items-center gap-3 lg:hidden">
             <span class="grid size-10 place-items-center rounded-xl bg-indigo-600 text-white"
               ><span class="material-symbols-rounded">verified_user</span></span
-            ><strong>Odivon · {{ product.name }}</strong>
+            ><strong>Odivon · F-Gas</strong>
           </div>
           <div class="mb-8">
             <span class="text-xs font-extrabold uppercase tracking-[.18em] text-indigo-600">{{
@@ -191,6 +225,11 @@ import { PRODUCT } from '../../domain/product-manifest';
               {{ (busy() ? 'auth.processing' : isRegister ? 'auth.register' : 'auth.login') | t }}
             </button>
           </form>
+          @if (isRegister) {
+            <p class="mt-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+              {{ 'auth.trialNote' | t }}
+            </p>
+          }
           <p class="mt-6 text-center text-sm text-slate-500">
             {{ (isRegister ? 'auth.hasAccount' : 'auth.noAccount') | t }}
             <a
@@ -210,6 +249,30 @@ import { PRODUCT } from '../../domain/product-manifest';
   `,
 })
 export class AuthPage {
+  readonly benefits = ['auth.benefitAuto', 'auth.benefitSchedule', 'auth.benefitAudit'] as const;
+  readonly preview = [
+    {
+      name: 'Soğuk oda kompresörü',
+      gas: 'R-404A · 12 kg · 56,7 t CO₂e',
+      date: '02.11.2026',
+      state: 'auth.previewOverdue',
+      tone: 'font-bold text-rose-300',
+    },
+    {
+      name: 'VRF dış ünite',
+      gas: 'R-410A · 15 kg · 33,8 t CO₂e',
+      date: '21.11.2026',
+      state: 'auth.previewSoon',
+      tone: 'font-bold text-amber-300',
+    },
+    {
+      name: 'Isı pompası',
+      gas: 'R-32 · 18 kg · 13,9 t CO₂e',
+      date: '14.03.2027',
+      state: 'auth.previewOk',
+      tone: 'font-bold text-emerald-300',
+    },
+  ] as const;
   readonly product = PRODUCT;
   readonly i18n = inject(I18nStore);
   readonly isRegister = inject(ActivatedRoute).snapshot.data['mode'] === 'register';
