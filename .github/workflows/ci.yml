@@ -34,7 +34,8 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CF_PAGES_PROJECT: ${{ vars.CF_PAGES_PROJECT || 'odivonf-gas' }}
+      CF_PAGES_PROJECT: ${{ vars.CF_PAGES_PROJECT }}
+      PUBLIC_HOST: ${{ vars.PUBLIC_HOST || 'fgas.odivon.com' }}
       APP_CHECK_SITE_KEY: ${{ vars.APP_CHECK_SITE_KEY }}
     steps:
       - name: Check Cloudflare credentials
@@ -55,14 +56,54 @@ jobs:
         run: npm ci
       - if: steps.creds.outputs.ready == 'true'
         run: npm run build
-      - name: Write runtime config
-        if: steps.creds.outputs.ready == 'true' && env.APP_CHECK_SITE_KEY != ''
+      - name: Resolve Cloudflare Pages project
+        id: project
+        if: steps.creds.outputs.ready == 'true'
         run: |
-          printf "window.__ODIVON_CONFIG__ = window.__ODIVON_CONFIG__ || {\n  appCheckSiteKey: '%s',\n};\n" "$APP_CHECK_SITE_KEY" \
-            > dist/OdivonF-Gas/browser/runtime-config.js
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
+          auth="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+          projects='[]'
+          for page in 1 2 3 4 5; do
+            body=$(curl -fsS -H "$auth" "$api/pages/projects?page=$page&per_page=10" || echo '{"result":[]}')
+            batch=$(echo "$body" | jq '.result // []')
+            [ "$(echo "$batch" | jq length)" = "0" ] && break
+            projects=$(jq -s 'add' <(echo "$projects") <(echo "$batch"))
+          done
+          echo "Pages projects in this account:"
+          echo "$projects" | jq -r '.[] | "  - \(.name)  (\(.subdomain // "-"); domains: \((.domains // []) | join(", ")))"'
+          name="$CF_PAGES_PROJECT"
+          if [ -z "$name" ]; then
+            name=$(echo "$projects" | jq -r --arg h "$PUBLIC_HOST" '[.[] | select((.domains // []) | index($h))][0].name // empty')
+          fi
+          if [ -z "$name" ]; then
+            worker=$(curl -fsS -H "$auth" "$api/workers/domains" 2>/dev/null \
+              | jq -r --arg h "$PUBLIC_HOST" '[.result[]? | select(.hostname == $h)][0].service // empty' || true)
+            if [ -n "$worker" ]; then
+              echo "::error::$PUBLIC_HOST is served by the Cloudflare Worker '$worker', not a Pages project."
+            else
+              echo "::error::No Pages project has the domain $PUBLIC_HOST. Set the CF_PAGES_PROJECT repository variable to one of the names above."
+            fi
+            exit 1
+          fi
+          echo "Deploying to Pages project: $name"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+      - name: Write runtime config
+        if: steps.creds.outputs.ready == 'true'
+        run: |
+          out=dist/OdivonF-Gas/browser/runtime-config.js
+          if [ -n "$APP_CHECK_SITE_KEY" ]; then
+            printf "window.__ODIVON_CONFIG__ = window.__ODIVON_CONFIG__ || {\n  appCheckSiteKey: '%s',\n};\n" "$APP_CHECK_SITE_KEY" > "$out"
+            echo "runtime-config.js written from APP_CHECK_SITE_KEY."
+          elif live=$(curl -fsS --max-time 15 "https://$PUBLIC_HOST/runtime-config.js") \
+            && echo "$live" | grep -Eq "appCheckSiteKey: *'[^']+'"; then
+            printf '%s\n' "$live" > "$out"
+            echo "Kept the runtime-config.js that is live on $PUBLIC_HOST."
+          else
+            echo "No App Check site key configured; using the committed runtime-config.js."
+          fi
       - name: Deploy to Cloudflare Pages
         if: steps.creds.outputs.ready == 'true'
         run: >
           npx --yes wrangler@4 pages deploy dist/OdivonF-Gas/browser
-          --project-name="$CF_PAGES_PROJECT" --branch=main
+          --project-name="${{ steps.project.outputs.name }}" --branch=main
           --commit-hash="$GITHUB_SHA" --commit-dirty=true
